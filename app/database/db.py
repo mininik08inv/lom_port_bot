@@ -1,16 +1,16 @@
 import psycopg
-import os
 
-from dotenv import load_dotenv
+from app.config_data.config import load_config
 
-load_dotenv()
+config = load_config('.env')
+
 
 def get_db_connection():
     db_conn = psycopg.connect(
-        host=os.environ.get('POSTGRES_HOST'),
-        dbname=os.environ.get('POSTGRES_DB'),
-        user=os.environ.get('POSTGRES_USER'),
-        password=os.environ.get('POSTGRES_PASSWORD'),
-        port=os.environ.get('POSTGRES_PORT')
+        host=config.db.db_host,
+        dbname=config.db.database,
+        user=config.db.db_user,
+        password=config.db.db_password,
+        # port=os.environ.get(config.db.)
     )
     return db_conn

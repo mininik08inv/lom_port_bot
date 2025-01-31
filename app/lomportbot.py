@@ -9,12 +9,15 @@ from app.handlers.commands import process_start_command, process_help_command, p
 
 import logging.config
 from loggs.logging_setting import logging_config
+from app.config_data.config import load_config
+
+config = load_config('.env')
 
 logging.config.dictConfig(logging_config)
 logger = logging.getLogger('bot')
 
 # BOT_TOKEN = os.environ.get('TELEGRAM_TOKEN')
-BOT_TOKEN = os.environ.get('COURSE_TEST_BOT_TOKEN')
+BOT_TOKEN = config.tg_bot.token
 
 # Создаем объекты бота и диспетчера
 dp: Dispatcher

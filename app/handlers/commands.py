@@ -13,7 +13,6 @@ load_dotenv()
 
 logging.config.dictConfig(logging_config)
 logger = logging.getLogger(__name__)
-print(logger)
 
 
 # Этот хэндлер будет срабатывать на команду "/start"
@@ -124,6 +123,7 @@ async def send_point(message: Message):
 # Этот хэндлер будет срабатывать на блокировку бота пользователем
 async def process_user_blocked_bot(event: ChatMemberUpdated):
     logger.warning(f'Пользователь {event.from_user.id}, user_name: {event.from_user.username} - заблокировал бота')
+
 
 # Этот хэндлер будет срабатывать когда бота расблокировали
 async def process_user_unblocked_bot(event: ChatMemberUpdated):
