@@ -19,7 +19,15 @@ logging_config = {
     },
     'loggers': {
         'bot': {
-            'handlers': ['save_request_handler',],
+            'handlers': ['save_request_handler', ],
+            'level': 'DEBUG',
+        },
+        'app.handlers.commands': {
+            'handlers': ['save_request_handler', ],
+            'level': 'DEBUG',
+        },
+        'app.utils.generating_a_reply_message': {
+            'handlers': ['save_request_handler', ],
             'level': 'DEBUG',
         }
     },
