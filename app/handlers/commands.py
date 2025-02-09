@@ -80,7 +80,7 @@ async def send_point(message: Message):
     try:
         # Делаем запрос к БД
         # Получаем ответ в виде кортежа
-        res_data = query_item_in_database(message.text.upper())
+        res_data = query_item_in_database(message.text.upper().replace(" ", ""))
         # Передаем  полученный кортеж в функцию
         if res_data:
             reply_message = generating_a_reply_message(res_data)
@@ -93,7 +93,7 @@ async def send_point(message: Message):
 
     finally:
         logger.info(
-            f'Пользователь с id:{message.from_user.id}, user_name: {message.from_user.username},fullname : {message.from_user.full_name}  запросил ПЗУ: "{message.text.upper()}"'
+            f'User id:{message.from_user.id}, user_name:{message.from_user.username}, fullname:{message.from_user.full_name} запросил ПЗУ: "{message.text.upper()}"'
         )
     await message.answer(text=reply_message, parse_mode="HTML")
 

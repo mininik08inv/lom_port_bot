@@ -46,7 +46,7 @@ async def process_buttons_pzu_press(callback: CallbackQuery):
 
     finally:
         logger.info(
-            f'User id: {callback.from_user.id}, user_name: {callback.from_user.username}, fullname: {callback.from_user.full_name}  запросил ПЗУ: "{callback.data.upper()}"'
+            f'User id:{callback.from_user.id}, user_name:{callback.from_user.username}, fullname:{callback.from_user.full_name}  запросил ПЗУ: "{callback.data.upper()}"'
         )
     await callback.message.edit_text(
         text=f'Вот ваше ПЗУ - {callback.data}'
