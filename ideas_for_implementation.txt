@@ -3,3 +3,21 @@ BOT:
     Добавить возможность выбора пзу из списка(облость или направление):
         -   При нажатии на пункт меню /list_pzu должны появляться кнопки с направлениямИ,  затем при нажатии на кнопку
             с нужным направлением должен появляться список кнопок с ПЗУ
+
+deploy:
+    кланирования репозитория
+    создание виртуального окружения
+    перенос файла .env
+    создать демона в /etc/systemd/system/
+        [Unit]
+        Description=My Bot Service
+        After=network.target
+
+        [Service]
+        WorkingDirectory=/path/to/my/bot
+        ExecStart=/usr/bin/python3 /path/to/my/bot/bot.py
+        Restart=always
+        RestartSec=5
+
+        [Install]
+        WantedBy=multi-user.target

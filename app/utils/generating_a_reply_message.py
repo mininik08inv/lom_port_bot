@@ -11,7 +11,7 @@ def generating_a_reply_message(point: tuple) -> str:
 
     weather = requests.get(
         f"https://api.open-meteo.com/v1/forecast?latitude={point[3]}&longitude={point[4]}&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m")
-    phone_number = point[-3] if len(point[-3]) > 0 else 'Неизвестен'
+    phone_number = point[-3] if len(point[-2]) > 0 else 'Неизвестен'
 
     reply_message = f'''Запрашиваемый пункт: {point[2]}
                  \nАдрес: {point[1]}

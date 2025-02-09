@@ -17,7 +17,6 @@ router = Router()
 
 list_d = [i[0] for i in list_directions()]
 
-
 @router.callback_query(F.data.in_(list_d))
 async def process_buttons_directions_press(callback: CallbackQuery):
     request_result = list_pzu_in_direction(callback.data)
