@@ -1,46 +1,31 @@
-import os
-from aiogram import Bot, Dispatcher
-from aiogram.filters import Command, ChatMemberUpdatedFilter, KICKED, MEMBER
-from aiogram.types import ContentType
-from aiogram import F
-
-from app.handlers.commands import process_start_command, process_help_command, process_list_pzu_command, if_the_photo, \
-    if_the_sticker, if_the_voice, if_something_else, send_point, process_user_unblocked_bot, process_user_blocked_bot
-
+import asyncio
 import logging.config
-from loggs.logging_setting import logging_config
+
+from aiogram import Bot, Dispatcher
+from handlers import commands, callback_directions
+from keyboards.set_menu import set_main_menu
+
+from app.loggs.logging_setting import logging_config
 from app.config_data.config import load_config
 
-config = load_config('.env')
-
 logging.config.dictConfig(logging_config)
-logger = logging.getLogger('bot')
+logger = logging.getLogger('lomportbot')
 
-# BOT_TOKEN = os.environ.get('TELEGRAM_TOKEN')
-BOT_TOKEN = config.tg_bot.token
+async def main():
+    config = load_config('.env')
 
-# Создаем объекты бота и диспетчера
-dp: Dispatcher
-bot = Bot(token=BOT_TOKEN)
-dp = Dispatcher()
+    BOT_TOKEN = config.tg_bot.token
 
-# Регистрируем хэндлеры
-dp.message.register(process_start_command, Command(commands='start'))
-dp.message.register(process_help_command, Command(commands='help'))
-dp.message.register(process_list_pzu_command, Command(commands='list_pzu'))
-dp.message.register(if_the_photo, F.content_type == ContentType.PHOTO)
-dp.message.register(if_the_sticker, F.content_type == ContentType.STICKER)
-dp.message.register(if_the_voice, F.content_type == ContentType.VOICE)
-dp.message.register(if_something_else, F.content_type.in_({ContentType.VIDEO_NOTE,
-                                                           ContentType.AUDIO,
-                                                           ContentType.DOCUMENT,
-                                                           ContentType.GAME,
-                                                           ContentType.UNKNOWN,
-                                                           ContentType.ANY
-                                                           }))
-dp.my_chat_member.register(process_user_blocked_bot, ChatMemberUpdatedFilter(member_status_changed=KICKED))
-dp.my_chat_member.register(process_user_unblocked_bot, ChatMemberUpdatedFilter(member_status_changed=MEMBER))
-dp.message.register(send_point)
+    bot = Bot(token=BOT_TOKEN)
+    dp = Dispatcher()
 
-if __name__ == '__main__':
-    dp.run_polling(bot)
+    dp.include_router(commands.router)
+    dp.include_router(callback_directions.router)
+
+    await set_main_menu(bot)
+    await bot.delete_webhook(drop_pending_updates=True)
+    await dp.start_polling(bot)
+
+logger.info('Bot started')
+asyncio.run(main())
+logger.info('Bot stopped')

@@ -1,10 +1,5 @@
 import requests
 from aiogram.utils.markdown import hlink
-import logging.config
-from app.loggs.logging_setting import logging_config
-
-logging.config.dictConfig(logging_config)
-logger = logging.getLogger(__name__)
 
 
 def generating_a_reply_message(point: tuple) -> str:

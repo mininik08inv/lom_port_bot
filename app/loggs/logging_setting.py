@@ -16,20 +16,24 @@ logging_config = {
             'filename': 'app/list_of_requests.log',
             'level': 'DEBUG',
         },
+        'console': {
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG',
+            'formatter': 'formatter_1',
+            'stream': 'ext://sys.stdout'
+        },
+        'bot_stopped': {
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG',
+            'formatter': 'formatter_1',
+            'stream': 'ext://sys.stdout'
+        },
     },
     'loggers': {
-        'bot': {
-            'handlers': ['save_request_handler', ],
+        'lomportbot': {
+            'handlers': ['save_request_handler', 'console'],
             'level': 'DEBUG',
         },
-        'app.handlers.commands': {
-            'handlers': ['save_request_handler', ],
-            'level': 'DEBUG',
-        },
-        'app.utils.generating_a_reply_message': {
-            'handlers': ['save_request_handler', ],
-            'level': 'DEBUG',
-        }
     },
 
 }
