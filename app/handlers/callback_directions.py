@@ -24,7 +24,7 @@ async def process_buttons_directions_press(callback: CallbackQuery):
     kb = create_kb_for_direction(callback.data)
     await callback.message.edit_text(
         text=f'Вы выблали направление - {callback.data}',
-        reply_markup=kb.as_markup()
+        reply_markup=kb
     )
 
 

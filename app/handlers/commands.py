@@ -1,3 +1,5 @@
+from copy import deepcopy
+
 from aiogram.types import Message, ChatMemberUpdated
 from aiogram.filters import Command, ChatMemberUpdatedFilter, KICKED, MEMBER
 from aiogram.types import ContentType
@@ -5,8 +7,9 @@ from aiogram import F
 from aiogram import Router
 
 from app.utils.generating_a_reply_message import generating_a_reply_message
-from app.database.db import get_db_connection, query_item_in_database
-from app.keyboards.inline import help_keyboard, contacts_keyboard, create_kb_for_list_pzu
+from app.database.db import users_db, query_item_in_database
+from app.keyboards.inline import create_kb_for_help, create_kb_for_contacts, create_kb_for_list_pzu
+from app.lexicon.lexicon import LEXICON
 
 import logging
 
@@ -20,24 +23,24 @@ async def process_start_command(message: Message):
     logger.info(
         f"Пользователь {message.from_user.id}, user_name: {message.from_user.username} - запустил бота"
     )
-    await message.answer(
-        "Привет!\nМеня зовут LomPortBot!\nЯ могу помочь вам с поиском ПЗУ\nПодробности в меню."
-    )
+    await message.answer(text=LEXICON['/start'])
+    if message.from_user.id not in users_db:
+        users_db.append(message.from_user.id)
 
 
 # Этот хэндлер будет срабатывать на команду "/help"
 async def process_help_command(message: Message):
     await message.answer(
-        text="Напиши мне название нужного ПЗУ \nЯ пришлю тебе информацию о нем, если она есть в моей базе!\nФормат должен быть таким: вп1, ВП1, Вп1 или например Ворсино. \n Список доступных ПЗУ здесь /list_pzu и в Меню",
-        reply_markup=help_keyboard
+        text=LEXICON['/help'],
+        reply_markup=create_kb_for_help()
     )
 
 
 # Этот хэндлер будет срабатывать на команду "/contacts"
 async def process_contacts_command(message: Message):
     await message.answer(
-        text='Не стесняйтесь обращаться за помощью или предлагайте улучшения!',
-        reply_markup=contacts_keyboard
+        text=LEXICON['/contacts'],
+        reply_markup=create_kb_for_contacts()
     )
 
 
@@ -47,7 +50,7 @@ async def process_list_pzu_command(message: Message):
     kb = create_kb_for_list_pzu()
     await message.answer(
         text='Вот список направлений, выбирай.',
-        reply_markup=kb.as_markup()
+        reply_markup=kb
     )
 
 
