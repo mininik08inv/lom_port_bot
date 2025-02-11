@@ -6,7 +6,7 @@ from aiogram import Router
 
 from app.utils.generating_a_reply_message import generating_a_reply_message
 from app.database.db import get_db_connection, query_item_in_database
-from app.keyboards.inline import help_keyboard, contacts_keyboard, directions_keyboard
+from app.keyboards.inline import help_keyboard, contacts_keyboard, create_kb_for_list_pzu
 
 import logging
 
@@ -44,10 +44,10 @@ async def process_contacts_command(message: Message):
 # Этот хэндлер будет срабатывать на команду "/list_pzu"
 async def process_list_pzu_command(message: Message):
     # logger.info("User: %s, user_name: %s запросил список пзу", {message.from_user.id}, {message.from_user.username})
-
+    kb = create_kb_for_list_pzu()
     await message.answer(
         text='Вот список направлений, выбирай.',
-        reply_markup=directions_keyboard.as_markup()
+        reply_markup=kb.as_markup()
     )
 
 

@@ -31,13 +31,15 @@ contacts_keyboard = InlineKeyboardMarkup(
 )
 
 # Создание клавиатуру для хендлера /list_pzu
-request_result = list_directions()
-request_result.sort()
-result_data = [i[0] for i in request_result]
+def create_kb_for_list_pzu():
+    request_result = list_directions()
+    request_result.sort()
+    result_data = [i[0] for i in request_result]
 
-buttons = [InlineKeyboardButton(text=direction, callback_data=direction) for direction in result_data]
-directions_keyboard = InlineKeyboardBuilder()
-directions_keyboard.row(*buttons, width=2)
+    buttons = [InlineKeyboardButton(text=direction, callback_data=direction) for direction in result_data]
+    directions_keyboard = InlineKeyboardBuilder()
+    directions_keyboard.row(*buttons, width=2)
+    return directions_keyboard
 
 
 # Создание клавиатуру для вывода пзу отдельного направления
