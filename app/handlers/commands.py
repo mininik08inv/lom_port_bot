@@ -83,7 +83,7 @@ async def send_point(message: Message):
     try:
         # Делаем запрос к БД
         # Получаем ответ в виде кортежа
-        res_data = query_item_in_database(message.text.upper().replace(" ", ""))
+        res_data = query_item_in_database(message.text.upper().replace(" ", "").replace("-", ""))
         # Передаем  полученный кортеж в функцию
         if res_data:
             reply_message = generating_a_reply_message(res_data)

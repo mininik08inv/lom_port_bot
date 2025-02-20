@@ -36,7 +36,6 @@ def query_item_in_database(item: str):
         try:
             cur.execute(sql_query, (item,))
             res_data = cur.fetchone()
-            print(res_data)
             return res_data
         except Exception as e:
             logger.exception("Ошибка в получении пункта из базы данных: %s", e)
