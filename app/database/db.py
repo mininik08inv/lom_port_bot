@@ -32,10 +32,11 @@ def execute_query(connection, query: str, *args):
 def query_item_in_database(item: str):
     db_conn = get_db_connection()
     with db_conn.cursor() as cur:
-        sql_query = "SELECT * FROM points_location WHERE abbreviation=%s"
+        sql_query = "SELECT name, abbreviation, lat, lon, phone FROM points_location WHERE abbreviation=%s"
         try:
             cur.execute(sql_query, (item,))
             res_data = cur.fetchone()
+            print(res_data)
             return res_data
         except Exception as e:
             logger.exception("Ошибка в получении пункта из базы данных: %s", e)
