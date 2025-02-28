@@ -44,7 +44,8 @@ def query_item_in_database(item: str):
 def list_directions():
     'Функция возвращает список направлений'
     db_conn = get_db_connection()
-    return execute_query(db_conn, 'select title from points_direction')
+    return execute_query(db_conn, 'SELECT title FROM points_direction WHERE id IN (SELECT direction_id FROM points_location WHERE direction_id IS NOT NULL)')
+
 
 
 def list_pzu_in_direction(direction: str):

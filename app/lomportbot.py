@@ -1,5 +1,3 @@
-import sys
-sys.path.append('./app/')
 
 import asyncio
 import logging.config
