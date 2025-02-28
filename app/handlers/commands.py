@@ -90,9 +90,9 @@ async def send_point(message: Message):
         else:
             reply_message = "Возможно вы ввели не верные данные или этого ПЗУ нет в базе!\n Инструкция здесь - /help а подробности в Меню"
 
-    except Exception:
+    except Exception as e:
         # Обработка ошибок
-        logger.exception("Какая то ошибка")
+        logger.exception("Какая то ошибка", e, message)
 
     finally:
         logger.info(
@@ -134,6 +134,8 @@ router.message.register(
     if_something_else,
     F.content_type.in_(
         {
+            ContentType.ANIMATION,
+            ContentType.VIDEO,
             ContentType.VIDEO_NOTE,
             ContentType.AUDIO,
             ContentType.DOCUMENT,

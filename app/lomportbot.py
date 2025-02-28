@@ -1,7 +1,13 @@
+import sys
+sys.path.append('./app/')
+
 import asyncio
 import logging.config
 
 from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
+
 from handlers import commands, callback_directions
 from keyboards.set_menu import set_main_menu
 
@@ -16,7 +22,7 @@ async def main():
 
     BOT_TOKEN = config.tg_bot.token
 
-    bot = Bot(token=BOT_TOKEN)
+    bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dp = Dispatcher()
 
     dp.include_router(commands.router)

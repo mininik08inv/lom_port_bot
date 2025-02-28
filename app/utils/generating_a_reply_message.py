@@ -22,6 +22,6 @@ def generating_a_reply_message(point: tuple) -> str:
                  \n{yand_map_url}
                  \n{two_gis_url}
                  \nНомер телефона: {phone_number}
-                 \nПогода в районе погрузки😄: температура воздуха : {weather.json()['current']['temperature_2m']}'''
+                 \nПогода в районе ПЗУ😄: температура воздуха : {weather.json()['current']['temperature_2m']}'''
 
     return reply_message

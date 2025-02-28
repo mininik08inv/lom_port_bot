@@ -17,13 +17,19 @@ router = Router()
 
 list_d = [i[0] for i in list_directions()]
 
+
 @router.callback_query(F.data.in_(list_d))
 async def process_buttons_directions_press(callback: CallbackQuery):
+    # Получить список всех пзу направления полученного из callback.data
     request_result = list_pzu_in_direction(callback.data)
     request_result.sort()
+
+    # Создать клавиатуру со списком ПЗУ
     kb = create_kb_for_direction(callback.data)
+
+    # Отправить сообщение с результатом запроса и клавиатурой
     await callback.message.edit_text(
-        text=f'Вы выблали направление - {callback.data}',
+        text=f'Вы выбрали направление - {callback.data}',
         reply_markup=kb
     )
 

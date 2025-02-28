@@ -58,7 +58,7 @@ def list_pzu_in_direction(direction: str):
 
 
 def list_pzu():
-    'Функция возвращает список ПЗУ'
+    'Функция возвращает список аббревиатур ПЗУ'
     db_conn = get_db_connection()
     result_request = execute_query(db_conn, 'select abbreviation from points_location')
     result = [i[0] for i in result_request]
