@@ -88,7 +88,7 @@ async def send_point(message: Message):
         if res_data:
             reply_message = generating_a_reply_message(res_data)
         else:
-            reply_message = "Возможно вы ввели не верные данные или этого ПЗУ нет в базе!\n Инструкция здесь - /help а подробности в Меню"
+            reply_message = LEXICON['not_found']
 
     except Exception as e:
         # Обработка ошибок
