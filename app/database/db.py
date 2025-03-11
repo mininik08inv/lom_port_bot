@@ -1,3 +1,5 @@
+from aiogram.types import Message
+
 import psycopg
 from app.config_data.config import load_config
 import logging
@@ -44,8 +46,8 @@ def query_item_in_database(item: str):
 def list_directions():
     'Функция возвращает список направлений'
     db_conn = get_db_connection()
-    return execute_query(db_conn, 'SELECT title FROM points_direction WHERE id IN (SELECT direction_id FROM points_location WHERE direction_id IS NOT NULL)')
-
+    return execute_query(db_conn,
+                         'SELECT title FROM points_direction WHERE id IN (SELECT direction_id FROM points_location WHERE direction_id IS NOT NULL)')
 
 
 def list_pzu_in_direction(direction: str):
@@ -65,5 +67,38 @@ def list_pzu():
     result = [i[0] for i in result_request]
     return result
 
-# Инициализируем временную "базу данных"
-users_db = []
+
+def add_id_to_database(user_id: int):
+    if not isinstance(user_id, int):
+        raise TypeError("user_id должен быть целым числом")
+
+
+    db_conn = get_db_connection()
+    with db_conn.cursor() as cur:
+        try:
+            # Проверяем, есть ли уже этот ID в базе данных
+            cur.execute("SELECT * FROM telegram_bot_users WHERE user_id = %s", (user_id,))
+            user = cur.fetchone()
+            # Если ID нет в базе данных, добавляем его
+            if user is None:
+                cur.execute("""
+                        INSERT INTO telegram_bot_users (user_id)
+                        VALUES (%s)
+                        ON CONFLICT (user_id) DO NOTHING
+                    """, (user_id,))
+                db_conn.commit()
+                logger.info(f"Пользователь {user_id} добавлен в базу данных.")
+        except Exception as e:
+            logger.exception("Ошибка при добавлении user_id в бд: %s", e)
+
+
+def delete_id_to_database(user_id):
+    db_conn = get_db_connection()
+    with db_conn.cursor() as cur:
+        try:
+            # Удаляем пользователя из базы данных
+            cur.execute("DELETE FROM telegram_bot_users WHERE user_id = %s", (user_id,))
+            db_conn.commit()
+            logger.info(f"Пользователь {user_id} удален из базы данных.")
+        except Exception as e:
+            logger.exception(f"Ошибка при удалении user_id из базы данных: {e}")

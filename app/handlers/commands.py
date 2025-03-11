@@ -1,5 +1,3 @@
-from copy import deepcopy
-
 from aiogram.types import Message, ChatMemberUpdated
 from aiogram.filters import Command, ChatMemberUpdatedFilter, KICKED, MEMBER
 from aiogram.types import ContentType
@@ -7,7 +5,7 @@ from aiogram import F
 from aiogram import Router
 
 from app.utils.generating_a_reply_message import generating_a_reply_message
-from app.database.db import users_db, query_item_in_database
+from app.database.db import query_item_in_database, get_db_connection, add_id_to_database, delete_id_to_database
 from app.keyboards.inline import create_kb_for_help, create_kb_for_contacts, create_kb_for_list_pzu
 from app.lexicon.lexicon import LEXICON
 
@@ -20,12 +18,14 @@ router = Router()
 
 # Этот хэндлер будет срабатывать на команду "/start"
 async def process_start_command(message: Message):
+    # Добавляем id в базу если еще нет
+    user_id = message.from_user.id
+    add_id_to_database(user_id)
+
     logger.info(
-        f"Пользователь {message.from_user.id}, user_name: {message.from_user.username} - запустил бота"
+        f"Пользователь {user_id}, user_name: {message.from_user.username} - запустил бота"
     )
     await message.answer(text=LEXICON['/start'])
-    if message.from_user.id not in users_db:
-        users_db.append(message.from_user.id)
 
 
 # Этот хэндлер будет срабатывать на команду "/help"
@@ -98,20 +98,43 @@ async def send_point(message: Message):
         logger.info(
             f'User id:{message.from_user.id}, user_name:{message.from_user.username}, fullname:{message.from_user.full_name} запросил ПЗУ: "{message.text.upper()}"'
         )
+    # Добавляем id в базу если еще нет
+    user_id = message.from_user.id
+    add_id_to_database(user_id)
+
     await message.answer(text=reply_message, parse_mode="HTML")
 
 
 # Этот хэндлер будет срабатывать на блокировку бота пользователем
 async def process_user_blocked_bot(event: ChatMemberUpdated):
-    logger.warning(
-        f"Пользователь {event.from_user.id}, user_name: {event.from_user.username} - заблокировал бота"
-    )
+    new_status = event.new_chat_member.status
+
+    # Проверяем, был ли пользователь удален или заблокировал бота
+    if new_status in ("left", "kicked"):
+        user_id = event.from_user.id
+        username = event.from_user.username
+
+        logger.warning(f"Пользователь {user_id}, user_name: {username} - заблокировал бота")
+
+        # Удаляем пользователя из базы данных
+        delete_id_to_database(user_id)
 
 
 # Этот хэндлер будет срабатывать когда бота расблокировали
 async def process_user_unblocked_bot(event: ChatMemberUpdated):
+    user_id = event.from_user.id
+
+    db_conn = get_db_connection()
+    with db_conn.cursor() as cur:
+        try:
+            # Удаляем пользователя из базы данных
+            cur.execute("DELETE FROM telegram_bot_users WHERE user_id = %s", (user_id,))
+            db_conn.commit()
+        except Exception as e:
+            logger.exception("Ошибка при удалении user_id из бд: %s", e)
+
     logger.warning(
-        f"Пользователь {event.from_user.id}, user_name: {event.from_user.username} - РАЗблокировал бота"
+        f"Пользователь {user_id}, user_name: {event.from_user.username} - РАЗблокировал бота"
     )
 
 

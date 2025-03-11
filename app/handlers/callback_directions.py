@@ -6,7 +6,7 @@ from aiogram import Router
 
 from app.handlers.commands import send_point
 from app.utils.generating_a_reply_message import generating_a_reply_message
-from app.database.db import list_directions, list_pzu_in_direction, list_pzu, query_item_in_database
+from app.database.db import list_directions, list_pzu_in_direction, list_pzu, query_item_in_database, add_id_to_database
 from app.keyboards.inline import create_kb_for_direction
 
 import logging
@@ -54,6 +54,8 @@ async def process_buttons_pzu_press(callback: CallbackQuery):
         logger.info(
             f'User id:{callback.from_user.id}, user_name:{callback.from_user.username}, fullname:{callback.from_user.full_name}  запросил ПЗУ: "{callback.data.upper()}"'
         )
+    user_id = callback.from_user.id
+    add_id_to_database(user_id)
     await callback.message.edit_text(
         text=f'Вот ваше ПЗУ - {callback.data}'
     )
