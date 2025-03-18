@@ -166,3 +166,4 @@ poetry.lock
 /pgadmin-data/
 
 ideas_for_implementation.txt
+/.env_prod

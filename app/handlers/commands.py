@@ -1,6 +1,5 @@
-from aiogram.types import Message, ChatMemberUpdated
+from aiogram.types import Message, ChatMemberUpdated, ContentType
 from aiogram.filters import Command, ChatMemberUpdatedFilter, KICKED, MEMBER
-from aiogram.types import ContentType
 from aiogram import F
 from aiogram import Router
 
@@ -12,6 +11,9 @@ from app.lexicon.lexicon import LEXICON
 import logging
 
 logger = logging.getLogger('lomportbot.commands')
+
+# Логгер для записи в базу данных
+db_logger = logging.getLogger('db_logger')
 
 router = Router()
 
@@ -98,6 +100,18 @@ async def send_point(message: Message):
         logger.info(
             f'User id:{message.from_user.id}, user_name:{message.from_user.username}, fullname:{message.from_user.full_name} запросил ПЗУ: "{message.text.upper()}"'
         )
+        # Запись в базу данных
+        db_logger.info(
+            'User id:%s, user_name:%s, fullname:%s запросил ПЗУ: "%s"',
+            message.from_user.id, message.from_user.username, message.from_user.full_name, message.text.upper(),
+            extra={
+                'user_id': message.from_user.id,
+                'user_name': message.from_user.username,
+                'fullname': message.from_user.full_name,
+                'pzu_name': message.text.upper(),
+            }
+        )
+
     # Добавляем id в базу если еще нет
     user_id = message.from_user.id
     add_id_to_database(user_id)

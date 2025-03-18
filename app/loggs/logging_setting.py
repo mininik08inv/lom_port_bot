@@ -1,6 +1,7 @@
-import sys
-import os
+from logging.config import dictConfig
+from .db_log_handler import PostgresHandler
 
+# Конфигурация логгеров
 logging_config = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -14,7 +15,7 @@ logging_config = {
             'class': 'logging.FileHandler',
             'formatter': 'formatter_1',
             'filename': 'app/list_of_requests.log',
-            'level': 'DEBUG',
+            'level': 'INFO',
         },
         'console': {
             'class': 'logging.StreamHandler',
@@ -22,18 +23,24 @@ logging_config = {
             'formatter': 'formatter_1',
             'stream': 'ext://sys.stdout'
         },
-        'bot_stopped': {
-            'class': 'logging.StreamHandler',
+        'postgres': {
+            '()': PostgresHandler,  # Используем наш PostgresHandler
             'level': 'DEBUG',
             'formatter': 'formatter_1',
-            'stream': 'ext://sys.stdout'
         },
     },
     'loggers': {
         'lomportbot': {
-            'handlers': ['save_request_handler', 'console'],
+            'handlers': ['save_request_handler', 'console'],  # Основной логгер
             'level': 'DEBUG',
         },
+        'db_logger': {
+            'handlers': ['postgres'],  # Логгер для записи в базу данных
+            'level': 'DEBUG',
+            'propagate': False,  # Отключаем распространение логов
+        },
     },
-
 }
+
+# Применяем конфигурацию
+dictConfig(logging_config)

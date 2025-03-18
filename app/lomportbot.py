@@ -1,14 +1,19 @@
-# main.py
+import sys
+import os
+
+# Добавляем корень проекта в sys.path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import asyncio
 import logging.config
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from handlers import commands, callback_directions
-from keyboards.set_menu import set_main_menu
+from app.handlers import commands, callback_directions
+from app.keyboards.set_menu import set_main_menu
 from app.loggs.logging_setting import logging_config
 from app.config_data.config import load_config
-from schedulers.scheduler import setup_scheduler  # Импортируем планировщик
+from app.schedulers.scheduler import setup_scheduler  # Импортируем планировщик
 
 logging.config.dictConfig(logging_config)
 logger = logging.getLogger('lomportbot')
@@ -20,10 +25,10 @@ async def main():
     dp = Dispatcher()
 
     # Настройка планировщика
-    logger.info("Запуск планировщика...")
+    logger.debug("Запуск планировщика...")
     scheduler = setup_scheduler(bot)
     scheduler.start()
-    logger.info("Планировщик запущен.")
+    logger.debug("Планировщик запущен.")
 
     dp.include_router(commands.router)
     dp.include_router(callback_directions.router)

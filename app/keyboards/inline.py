@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from app.database.db import get_db_connection, execute_query, list_directions, list_pzu_in_direction
+from app.database.db import list_directions, list_pzu_in_direction
 
 
 def create_kb_for_contacts():

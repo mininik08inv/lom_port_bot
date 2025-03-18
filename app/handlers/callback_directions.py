@@ -1,10 +1,7 @@
-from aiogram.types import Message, ChatMemberUpdated, CallbackQuery
-from aiogram.filters import Command, ChatMemberUpdatedFilter, KICKED, MEMBER
-from aiogram.types import ContentType
+from aiogram.types import CallbackQuery
 from aiogram import F
 from aiogram import Router
 
-from app.handlers.commands import send_point
 from app.utils.generating_a_reply_message import generating_a_reply_message
 from app.database.db import list_directions, list_pzu_in_direction, list_pzu, query_item_in_database, add_id_to_database
 from app.keyboards.inline import create_kb_for_direction
@@ -12,6 +9,9 @@ from app.keyboards.inline import create_kb_for_direction
 import logging
 
 logger = logging.getLogger('lomportbot.callback_directions')
+
+# Логгер для записи в базу данных
+db_logger = logging.getLogger('db_logger')
 
 router = Router()
 
@@ -48,12 +48,24 @@ async def process_buttons_pzu_press(callback: CallbackQuery):
 
     except Exception as e:
         # Обработка ошибок
-        logger.exception("Какая то ошибка")
+        logger.exception("Какая то ошибка", e)
 
     finally:
         logger.info(
             f'User id:{callback.from_user.id}, user_name:{callback.from_user.username}, fullname:{callback.from_user.full_name}  запросил ПЗУ: "{callback.data.upper()}"'
         )
+        # Запись в базу данных
+        db_logger.info(
+            'User id:%s, user_name:%s, fullname:%s запросил ПЗУ: "%s"',
+            callback.from_user.id, callback.from_user.username, callback.from_user.full_name, callback.data.upper(),
+            extra={
+                'user_id': callback.from_user.id,
+                'user_name': callback.from_user.username,
+                'fullname': callback.from_user.full_name,
+                'pzu_name': callback.data.upper(),
+            }
+        )
+
     user_id = callback.from_user.id
     add_id_to_database(user_id)
     await callback.message.edit_text(

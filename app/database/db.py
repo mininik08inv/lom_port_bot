@@ -1,6 +1,5 @@
-from aiogram.types import Message
-
 import psycopg
+from datetime import datetime
 from app.config_data.config import load_config
 import logging
 
@@ -102,3 +101,54 @@ def delete_id_to_database(user_id):
             logger.info(f"Пользователь {user_id} удален из базы данных.")
         except Exception as e:
             logger.exception(f"Ошибка при удалении user_id из базы данных: {e}")
+
+def get_list_requests(date_from=None, date_to=None):
+    """
+    Получает список запросов из таблицы bot_logs за указанный период.
+
+    :param date_from: Начальная дата периода (в формате 'YYYY-MM-DD'). Если не указана, используется '2025-03-01'.
+    :param date_to: Конечная дата периода (в формате 'YYYY-MM-DD'). Если не указана, используется текущая дата.
+    :return: Список словарей с данными запросов.
+    """
+    # Устанавливаем значения по умолчанию, если параметры не переданы
+    if date_from is None:
+        date_from = '2025-03-01'  # Начальная дата по умолчанию
+    if date_to is None:
+        date_to = datetime.now().strftime('%Y-%m-%d')  # Текущая дата по умолчанию
+
+    try:
+        # Подключаемся к базе данных
+        with get_db_connection() as connection:
+            with connection.cursor() as cur:
+                # Формируем SQL-запрос
+                query = """
+                    SELECT log_level, log_time, filename, message, user_id, user_name, fullname, pzu_name
+                    FROM bot_logs
+                    WHERE log_time >= %s AND log_time <= %s
+                    ORDER BY log_time ASC
+                """
+                # Выполняем запрос с параметрами
+                cur.execute(query, (date_from, date_to))
+                # Получаем результаты
+                results = cur.fetchall()
+
+                # Преобразуем результаты в список словарей
+                requests = []
+                for row in results:
+                    requests.append({
+                        'log_level': row[0],
+                        'log_time': row[1],
+                        'filename': row[2],
+                        'message': row[3],
+                        'user_id': row[4],
+                        'user_name': row[5],
+                        'fullname': row[6],
+                        'pzu_name': row[7],
+                    })
+
+                return requests
+
+    except Exception as e:
+        # Логируем ошибку
+        logger.error(f"Ошибка при получении списка запросов: {e}")
+        return []
