@@ -19,7 +19,7 @@ logging.config.dictConfig(logging_config)
 logger = logging.getLogger('lomportbot')
 
 async def main():
-    config = load_config('.env')
+    config = load_config('.env_prod')
     BOT_TOKEN = config.tg_bot.token
     bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dp = Dispatcher()

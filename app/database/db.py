@@ -5,7 +5,7 @@ import logging
 
 logger = logging.getLogger('lomportbot.db')
 
-config = load_config('.env')
+config = load_config('.env_prod')
 
 
 def get_db_connection():

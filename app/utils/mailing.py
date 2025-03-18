@@ -6,7 +6,7 @@ from app.database.db import get_db_connection, get_list_requests
 from app.lexicon.lexicon import LEXICON
 from app.config_data.config import load_config
 
-config = load_config('.env')
+config = load_config('.env_prod')
 
 logger = logging.getLogger('lomportbot.mailing')
 
