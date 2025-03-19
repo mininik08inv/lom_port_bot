@@ -13,7 +13,10 @@ async def set_main_menu(bot: Bot):
                    description=LEXICON_COMMANDS['/help']),
         BotCommand(command='/contacts',
                    description=LEXICON_COMMANDS['/contacts']),
+        BotCommand(command='/donate',
+                   description=LEXICON_COMMANDS['/donate']),
         BotCommand(command='/list_pzu',
-                   description=LEXICON_COMMANDS['/list_pzu'])
+                   description=LEXICON_COMMANDS['/list_pzu']),
+
     ]
     await bot.set_my_commands(main_menu_commands)

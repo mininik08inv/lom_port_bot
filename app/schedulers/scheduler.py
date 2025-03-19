@@ -20,7 +20,7 @@ def setup_scheduler(bot: Bot) -> AsyncIOScheduler:
         hour=19,
         minute=30,
         # "interval",
-        # seconds=15,
+        # seconds=20,
         args=(bot,),
         id="monthly_mailing",  # Уникальный идентификатор задачи
     )

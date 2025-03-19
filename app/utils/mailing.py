@@ -3,10 +3,11 @@ from datetime import datetime, timedelta
 
 from aiogram import Bot
 from app.database.db import get_db_connection, get_list_requests
+from app.keyboards.inline import combined_kb
 from app.lexicon.lexicon import LEXICON
 from app.config_data.config import load_config
 
-config = load_config('.env_prod')
+config = load_config('.env')
 
 logger = logging.getLogger('lomportbot.mailing')
 
@@ -24,7 +25,8 @@ async def monthly_mailing(bot: Bot):
             # Отправляем сообщение каждому пользователю
             for user in users:
                 try:
-                    await bot.send_message(chat_id=user[0], text=LEXICON['mailing_list_text'])
+                    await bot.send_message(chat_id=user[0], text=LEXICON['mailing_list_text'],
+                                           reply_markup=combined_kb)
                     logger.debug(f"Сообщение отправлено пользователю {user[0]}.")
                 except Exception as e:
                     logger.error(f"Ошибка при отправке сообщения пользователю {user[0]}: {e}")

@@ -20,14 +20,21 @@ router = Router()
 
 # Этот хэндлер будет срабатывать на команду "/start"
 async def process_start_command(message: Message):
-    # Добавляем id в базу если еще нет
-    user_id = message.from_user.id
-    add_id_to_database(user_id)
+    # Проверяем, есть ли payload в команде /start
+    if len(message.text.split()) > 1:
+        payload = message.text.split()[1]  # Получаем payload (например, "payment_success_100")
+        if payload.startswith("payment_success_"):
+            amount = payload.split("_")[2]  # Извлекаем сумму
+            await message.answer(f"Спасибо за вашу поддержку в размере {amount} рублей! 🎉")
+    else:
+        # Добавляем id в базу если еще нет
+        user_id = message.from_user.id
+        add_id_to_database(user_id)
 
-    logger.info(
-        f"Пользователь {user_id}, user_name: {message.from_user.username} - запустил бота"
-    )
-    await message.answer(text=LEXICON['/start'])
+        logger.info(
+            f"Пользователь {user_id}, user_name: {message.from_user.username} - запустил бота"
+        )
+        await message.answer(text=LEXICON['/start'])
 
 
 # Этот хэндлер будет срабатывать на команду "/help"
