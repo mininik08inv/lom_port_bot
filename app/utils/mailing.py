@@ -1,13 +1,15 @@
 import logging
+import os
 from datetime import datetime, timedelta
 
 from aiogram import Bot
+
 from app.database.db import get_db_connection, get_list_requests
 from app.keyboards.inline import combined_kb
 from app.lexicon.lexicon import LEXICON
 from app.config_data.config import load_config
 
-config = load_config('.env')
+config = load_config()
 
 logger = logging.getLogger('lomportbot.mailing')
 

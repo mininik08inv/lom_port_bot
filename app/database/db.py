@@ -5,7 +5,7 @@ import logging
 
 logger = logging.getLogger('lomportbot.db')
 
-config = load_config('.env')
+config = load_config()
 
 
 def get_db_connection():
@@ -71,7 +71,6 @@ def add_id_to_database(user_id: int):
     if not isinstance(user_id, int):
         raise TypeError("user_id должен быть целым числом")
 
-
     db_conn = get_db_connection()
     with db_conn.cursor() as cur:
         try:
@@ -101,6 +100,7 @@ def delete_id_to_database(user_id):
             logger.info(f"Пользователь {user_id} удален из базы данных.")
         except Exception as e:
             logger.exception(f"Ошибка при удалении user_id из базы данных: {e}")
+
 
 def get_list_requests(date_from=None, date_to=None):
     """
