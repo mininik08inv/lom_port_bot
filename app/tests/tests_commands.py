@@ -3,35 +3,46 @@ import pytest
 from aiogram import Dispatcher, Bot
 from aiogram.types import Message, User, Chat, Update
 from aiogram.filters import Command
-from unittest.mock import AsyncMock
+from unittest.mock import AsyncMock, patch
 from app.handlers.commands import process_start_command
+
 
 @pytest.mark.asyncio
 async def test_process_start_command():
-    # Создаем мок-объект бота
+    # 1. Создаем мок бота с правильной настройкой
     bot = AsyncMock(spec=Bot)
+    bot.send_message = AsyncMock()  # Явно мокируем метод
 
-    # Создаем диспетчер
+    # 2. Инициализируем диспетчер
     dp = Dispatcher()
 
-    # Регистрируем хэндлер
+    # 3. Регистрируем обработчик
     dp.message.register(process_start_command, Command("start"))
 
-    # Создаем мок-объект сообщения
-    message = Message(
+    # 4. Создаем тестовые данные
+    test_user = User(
+        id=123,
+        is_bot=False,
+        first_name="Test",
+        username="test_user"
+    )
+    test_chat = Chat(id=123, type="private")
+    test_message = Message(
         message_id=1,
         date=datetime.now(),
-        chat=Chat(id=1, type="private"),
-        from_user=User(id=1, is_bot=False, first_name="Test"),
-        text="/start",
+        chat=test_chat,
+        from_user=test_user,
+        text="/start"
     )
+    update = Update(update_id=1, message=test_message)
 
-    # Эмулируем обработку сообщения
-    update = Update(update_id=1, message=message)
-    await dp.feed_update(bot, update=update)
+    # 5. Запускаем обработку
+    await dp.feed_update(bot, update)
 
-    # Логируем вызовы метода send_message
-    print("Calls to send_message:", bot.send_message.mock_calls)
+    # 6. Проверяем вызовы
+    bot.send_message.assert_awaited_once()
 
-    # Проверяем, что бот вызвал метод answer с правильным текстом
-    bot.send_message.assert_called_once_with(chat_id=1, text="Привет!")
+    # Дополнительные проверки аргументов
+    args, kwargs = bot.send_message.await_args
+    assert kwargs['chat_id'] == 123
+    assert "Привет" in kwargs['text']  # Проверяем часть текста

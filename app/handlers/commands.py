@@ -29,7 +29,7 @@ async def process_start_command(message: Message):
     else:
         # Добавляем id в базу если еще нет
         user_id = message.from_user.id
-        add_id_to_database(user_id)
+        await add_id_to_database(user_id)
 
         logger.info(
             f"Пользователь {user_id}, user_name: {message.from_user.username} - запустил бота"
@@ -55,8 +55,7 @@ async def process_contacts_command(message: Message):
 
 # Этот хэндлер будет срабатывать на команду "/list_pzu"
 async def process_list_pzu_command(message: Message):
-    # logger.info("User: %s, user_name: %s запросил список пзу", {message.from_user.id}, {message.from_user.username})
-    kb = create_kb_for_list_pzu()
+    kb = await create_kb_for_list_pzu()
     await message.answer(
         text='Вот список направлений, выбирай.',
         reply_markup=kb
@@ -92,7 +91,7 @@ async def send_point(message: Message):
     try:
         # Делаем запрос к БД
         # Получаем ответ в виде кортежа
-        res_data = query_item_in_database(message.text.upper().replace(" ", "").replace("-", ""))
+        res_data = await query_item_in_database(message.text.upper().replace(" ", "").replace("-", ""))
         # Передаем  полученный кортеж в функцию
         if res_data:
             reply_message = generating_a_reply_message(res_data)
@@ -121,7 +120,7 @@ async def send_point(message: Message):
 
     # Добавляем id в базу если еще нет
     user_id = message.from_user.id
-    add_id_to_database(user_id)
+    await add_id_to_database(user_id)
 
     await message.answer(text=reply_message, parse_mode="HTML")
 
@@ -145,7 +144,7 @@ async def process_user_blocked_bot(event: ChatMemberUpdated):
 async def process_user_unblocked_bot(event: ChatMemberUpdated):
     user_id = event.from_user.id
 
-    db_conn = get_db_connection()
+    db_conn = await get_db_connection()
     with db_conn.cursor() as cur:
         try:
             # Удаляем пользователя из базы данных

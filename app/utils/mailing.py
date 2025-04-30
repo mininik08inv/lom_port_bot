@@ -16,7 +16,7 @@ logger = logging.getLogger('lomportbot.mailing')
 
 async def monthly_mailing(bot: Bot):
     logger.debug("Запуск задачи рассылки...")
-    db_conn = get_db_connection()
+    db_conn = await get_db_connection()
     try:
         with db_conn.cursor() as cur:
             # Получаем список всех пользователей

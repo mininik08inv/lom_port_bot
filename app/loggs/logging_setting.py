@@ -1,5 +1,5 @@
 from logging.config import dictConfig
-from .db_log_handler import PostgresHandler
+from .db_log_handler import AsyncPostgresHandler
 
 # Конфигурация логгеров
 logging_config = {
@@ -24,7 +24,7 @@ logging_config = {
             'stream': 'ext://sys.stdout'
         },
         'postgres': {
-            '()': PostgresHandler,  # Используем наш PostgresHandler
+            '()': AsyncPostgresHandler,  # Используем наш AsyncPostgresHandler
             'level': 'DEBUG',
             'formatter': 'formatter_1',
         },

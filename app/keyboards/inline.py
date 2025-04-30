@@ -37,20 +37,19 @@ def create_kb_for_help():
 
 
 # Создание клавиатуру для хендлера /list_pzu
-def create_kb_for_list_pzu() -> InlineKeyboardMarkup:
-    request_result = list_directions()
+async def create_kb_for_list_pzu() -> InlineKeyboardMarkup:
+    request_result = await list_directions()
     request_result.sort()
-    result_data = [i[0] for i in request_result]
 
-    buttons = [InlineKeyboardButton(text=direction, callback_data=direction) for direction in result_data]
+    buttons = [InlineKeyboardButton(text=direction, callback_data=direction) for direction in request_result]
     directions_keyboard = InlineKeyboardBuilder()
     directions_keyboard.row(*buttons, width=2)
     return directions_keyboard.as_markup()
 
 
 # Создание клавиатуру для вывода пзу отдельного направления
-def create_kb_for_direction(direction: str) -> InlineKeyboardMarkup:
-    request_result = list_pzu_in_direction(direction)
+async def create_kb_for_direction(direction: str) -> InlineKeyboardMarkup:
+    request_result = await list_pzu_in_direction(direction)
     request_result.sort()
     buttons = [InlineKeyboardButton(text=pzu, callback_data=pzu) for pzu in request_result]
     directions_keyboard = InlineKeyboardBuilder()
