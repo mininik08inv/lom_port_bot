@@ -16,9 +16,9 @@ def setup_scheduler(bot: Bot) -> AsyncIOScheduler:
     scheduler.add_job(
         monthly_mailing,
         "cron",
-        day=1,
-        hour=19,
-        minute=30,
+        day=30,
+        hour=10,
+        minute=16,
         # "interval",
         # seconds=20,
         args=(bot,),

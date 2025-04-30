@@ -42,7 +42,7 @@ def load_config(path: Optional[str] = None) -> Config:
 
     env = Env()
     env.read_env(path)  # Загружаем переменные из файла
-    print(path)
+    # print(path)
 
     return Config(
         tg_bot=TgBot(
