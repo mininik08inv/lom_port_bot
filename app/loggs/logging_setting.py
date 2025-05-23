@@ -34,6 +34,10 @@ logging_config = {
             'handlers': ['save_request_handler', 'console'],  # Основной логгер
             'level': 'DEBUG',
         },
+        'app': {
+            'handlers': ['save_request_handler', 'console'],  # Основной логгер
+            'level': 'DEBUG',
+        },
         'db_logger': {
             'handlers': ['postgres'],  # Логгер для записи в базу данных
             'level': 'DEBUG',

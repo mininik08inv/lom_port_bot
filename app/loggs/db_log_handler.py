@@ -25,7 +25,6 @@ class AsyncPostgresHandler(logging.Handler):
         """Реальная асинхронная запись"""
         try:
             await self.connect()
-            q = 1 / 0
             await execute_query(self.connection,
                                 """
                 INSERT INTO bot_logs (

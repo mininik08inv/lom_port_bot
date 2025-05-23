@@ -14,15 +14,19 @@ from app.keyboards.set_menu import set_main_menu
 from app.loggs.logging_setting import logging_config
 from app.config_data.config import load_config
 from app.schedulers.scheduler import setup_scheduler  # Импортируем планировщик
+from app.middlewares.db_access import DBAccessMiddleware  # Импорт middleware
 
 logging.config.dictConfig(logging_config)
 logger = logging.getLogger('lomportbot')
+
 
 async def main():
     config = load_config()
     BOT_TOKEN = config.tg_bot.token
     bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dp = Dispatcher()
+
+    dp.update.outer_middleware(DBAccessMiddleware())
 
     # Настройка планировщика
     logger.debug("Запуск планировщика...")

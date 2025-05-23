@@ -10,7 +10,6 @@ from aiogram.fsm.state import State, StatesGroup
 from app.config_data.config import load_config
 from app.keyboards.inline import donat_amount_keyboard, transition_to_payment_keyboard
 from app.keyboards.kb import get_cancel_keyboard
-from app.filters.my_filters import IsValidAmount
 import logging
 
 logger = logging.getLogger('lomportbot.payments')

@@ -1,10 +1,9 @@
 import asyncio
 
 from aiogram.types import CallbackQuery
-from aiogram import F
 from aiogram import Router
 
-from app.filters.my_filters import direction_filter
+from app.filters.my_filters import direction_filter, pzu_filter
 from app.utils.generating_a_reply_message import generating_a_reply_message
 from app.database.db import list_directions, list_pzu_in_direction, get_list_pzu, query_item_in_database, \
     add_id_to_database
@@ -44,15 +43,7 @@ async def process_buttons_directions_press(callback: CallbackQuery):
         await callback.answer("Произошла ошибка", show_alert=True)
 
 
-def sync_list_pzu():
-    """Синхронная версия, возвращающая список"""
-    return asyncio.run(get_list_pzu())
-
-
-list_pzu = [i for i in sync_list_pzu()]
-
-
-@router.callback_query(F.data.in_(list_pzu))
+@router.callback_query(pzu_filter)
 async def process_buttons_pzu_press(callback: CallbackQuery):
     try:
         # Делаем запрос к БД

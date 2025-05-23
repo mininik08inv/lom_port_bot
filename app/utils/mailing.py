@@ -1,6 +1,7 @@
 import logging
 import os
 from datetime import datetime, timedelta
+import asyncio
 
 from aiogram import Bot
 
@@ -18,26 +19,26 @@ async def monthly_mailing(bot: Bot):
     logger.debug("Запуск задачи рассылки...")
     db_conn = await get_db_connection()
     try:
-        with db_conn.cursor() as cur:
-            # Получаем список всех пользователей
-            cur.execute("SELECT user_id FROM telegram_bot_users")
-            users = cur.fetchall()
-            logger.debug(f"Найдено {len(users)} пользователей для рассылки.")
+        # Для asyncpg не нужно явно создавать курсор для простых запросов
+        users = await db_conn.fetch("SELECT user_id FROM telegram_bot_users")
+        logger.debug(f"Найдено {len(users)} пользователей для рассылки.")
 
-            # Отправляем сообщение каждому пользователю
-            for user in users:
-                try:
-                    await bot.send_message(chat_id=user[0], text=LEXICON['mailing_list_text'],
-                                           reply_markup=combined_kb)
-                    logger.debug(f"Сообщение отправлено пользователю {user[0]}.")
-                except Exception as e:
-                    logger.error(f"Ошибка при отправке сообщения пользователю {user[0]}: {e}")
+        for user in users:
+            try:
+                await bot.send_message(
+                    chat_id=user['user_id'],
+                    text=LEXICON['mailing_list_text'],
+                    reply_markup=combined_kb
+                )
+                logger.debug(f"Сообщение отправлено пользователю {user['user_id']}.")
+            except Exception as e:
+                logger.error(f"Ошибка при отправке пользователю {user['user_id']}: {e}")
 
-            logger.info("Рассылка завершена.")
+        logger.info("Рассылка завершена.")
     except Exception as e:
-        logger.exception("Ошибка при выполнении задачи рассылки: %s", e)
+        logger.exception(f"Ошибка при выполнении задачи рассылки: {e}")
     finally:
-        db_conn.close()
+        await db_conn.close()
 
 
 async def daily_report(bot: Bot):
@@ -48,15 +49,16 @@ async def daily_report(bot: Bot):
 
     try:
         # Получаем текущую дату
-        today = datetime.now().strftime('%Y-%m-%d')  # Формат: '2025-03-18'
+        today = datetime.now()
         # Получаем вчерашнюю дату
-        yesterday = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')  # Формат: '2025-03-17'
+        yesterday = (datetime.now() - timedelta(days=1))
 
         # Получаем количество обработанных запросов за сегодня
-        number_of_requests_processed = len(get_list_requests(date_from=yesterday, date_to=today))
+        len_list_request = await get_list_requests(date_from=yesterday, date_to=today)
+        number_of_requests_processed = len(len_list_request)
 
         # Формируем текст отчета
-        report_text = LEXICON['daily_report_text'].format(yesterday, number_of_requests_processed)
+        report_text = LEXICON['daily_report_text'].format(yesterday.strftime('%Y-%m-%d'), number_of_requests_processed)
 
         # Отправляем сообщение каждому администратору
         for admin_id in config.tg_bot.admin_ids:

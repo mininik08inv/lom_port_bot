@@ -7,7 +7,6 @@ logger = logging.getLogger('lomportbot.generating_a_reply_message')
 
 
 def generating_a_reply_message(point) -> str:
-    print('Дошли сюда')
     yand_navi_url = hlink(' В путь с Яндекс Навигатором! ',
                           f'https://yandex.ru/navi?whatshere%5Bpoint%5D={point[3]}%2C{point[2]}&whatshere%5Bzoom%5D=16.768925&ll={point[3]}%2C{point[2]}&z=16.768925&si=e5wmhgefmj352468jpym3ewa4m')
     yand_map_url = hlink(' В путь с Яндекс Картами! ',

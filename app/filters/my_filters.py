@@ -1,22 +1,23 @@
 from aiogram.filters import BaseFilter
 from aiogram.types import Message, CallbackQuery
 
-from app.database.db import list_directions
+from app.database.db import list_directions, get_list_pzu
 
 import logging
 
 logger = logging.getLogger(__name__)
+print(logger)
 
-
-class IsValidAmount(BaseFilter):
-    logger.debug('работает фильтр IsValidAmount')
-    async def __call__(self, message: Message) -> bool:
-        if not message.text.isdigit():
-            return False
-        return 10 <= int(message.text) <= 100000
 
 async def direction_filter(callback: CallbackQuery) -> bool:
-    logger.debug('работает фильтр IsValidAmount')
+    logger.debug('работает фильтр direction_filter')
     """Фильтр для проверки, что callback.data - это существующее направление"""
     directions = await list_directions()
     return callback.data in directions
+
+
+async def pzu_filter(callback: CallbackQuery) -> bool:
+    logger.debug('работает фильтр pzu_filter')
+    """Фильтр для проверки, что callback.data - это существующее pzu"""
+    list_pzu = await get_list_pzu()
+    return callback.data in list_pzu

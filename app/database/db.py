@@ -155,7 +155,6 @@ async def get_list_requests(date_from=None, date_to=None):
                 'fullname': row['fullname'],
                 'pzu_name': row['pzu_name'],
             })
-
         return requests
     except Exception as e:
         logger.error(f"Ошибка при получении списка запросов: {e}")
