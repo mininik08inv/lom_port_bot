@@ -137,10 +137,10 @@ async def process_user_blocked_bot(event: ChatMemberUpdated):
         logger.warning(f"Пользователь {user_id}, user_name: {username} - заблокировал бота")
 
         # Удаляем пользователя из базы данных
-        delete_id_to_database(user_id)
+        await delete_id_to_database(user_id)
 
 
-# Этот хэндлер будет срабатывать когда бота расблокировали
+# Этот хэндлер будет срабатывать когда бота разблокировали
 async def process_user_unblocked_bot(event: ChatMemberUpdated):
     user_id = event.from_user.id
 
