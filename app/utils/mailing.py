@@ -24,6 +24,9 @@ async def monthly_mailing(bot: Bot):
         logger.debug(f"Найдено {len(users)} пользователей для рассылки.")
 
         for user in users:
+            if user['user_id'] == 379228746:
+                logger.info('Пропускаем: ', user['user_id'])
+                continue
             try:
                 await bot.send_message(
                     chat_id=user['user_id'],
