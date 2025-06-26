@@ -20,19 +20,14 @@ async def test_process_start_command():
     dp.message.register(process_start_command, Command("start"))
 
     # 4. Создаем тестовые данные
-    test_user = User(
-        id=123,
-        is_bot=False,
-        first_name="Test",
-        username="test_user"
-    )
+    test_user = User(id=123, is_bot=False, first_name="Test", username="test_user")
     test_chat = Chat(id=123, type="private")
     test_message = Message(
         message_id=1,
         date=datetime.now(),
         chat=test_chat,
         from_user=test_user,
-        text="/start"
+        text="/start",
     )
     update = Update(update_id=1, message=test_message)
 
@@ -44,5 +39,5 @@ async def test_process_start_command():
 
     # Дополнительные проверки аргументов
     args, kwargs = bot.send_message.await_args
-    assert kwargs['chat_id'] == 123
-    assert "Привет" in kwargs['text']  # Проверяем часть текста
+    assert kwargs["chat_id"] == 123
+    assert "Привет" in kwargs["text"]  # Проверяем часть текста

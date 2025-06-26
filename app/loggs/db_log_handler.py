@@ -4,7 +4,7 @@ import asyncpg
 from datetime import datetime
 from app.database.db import get_db_connection, execute_query
 
-logger = logging.getLogger('lomportbot.db_log_handler')
+logger = logging.getLogger("lomportbot.db_log_handler")
 
 
 class AsyncPostgresHandler(logging.Handler):
@@ -25,8 +25,9 @@ class AsyncPostgresHandler(logging.Handler):
         """Реальная асинхронная запись"""
         try:
             await self.connect()
-            await execute_query(self.connection,
-                                """
+            await execute_query(
+                self.connection,
+                """
                 INSERT INTO bot_logs (
                     log_level, 
                     log_time, 
@@ -38,14 +39,14 @@ class AsyncPostgresHandler(logging.Handler):
                     pzu_name
                 ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
                 """,
-                                record.levelname,
-                                datetime.now(),
-                                record.filename,
-                                record.getMessage(),
-                                getattr(record, 'user_id', None),
-                                getattr(record, 'user_name', None),
-                                getattr(record, 'fullname', None),
-                                getattr(record, 'pzu_name', None)
-                                )
+                record.levelname,
+                datetime.now(),
+                record.filename,
+                record.getMessage(),
+                getattr(record, "user_id", None),
+                getattr(record, "user_name", None),
+                getattr(record, "fullname", None),
+                getattr(record, "pzu_name", None),
+            )
         except Exception as e:
             logger.info(f"Ошибка записи лога: {e}")

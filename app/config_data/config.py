@@ -38,7 +38,7 @@ def load_config(path: Optional[str] = None) -> Config:
     """
     # Автоматический выбор файла, если path не задан
     if path is None:
-        path = '.env_prod' if os.getenv('PRODUCTION', '').lower() == 'true' else '.env'
+        path = ".env_prod" if os.getenv("PRODUCTION", "").lower() == "true" else ".env"
 
     env = Env()
     env.read_env(path)  # Загружаем переменные из файла
@@ -46,17 +46,15 @@ def load_config(path: Optional[str] = None) -> Config:
 
     return Config(
         tg_bot=TgBot(
-            token=env('TELEGRAM_TOKEN'),
-            admin_ids=list(map(int, env.list('ADMIN_IDS')))
+            token=env("TELEGRAM_TOKEN"), admin_ids=list(map(int, env.list("ADMIN_IDS")))
         ),
         db=DatabaseConfig(
-            database=env('POSTGRES_DB'),
-            db_host=env('POSTGRES_HOST'),
-            db_user=env('POSTGRES_USER'),
-            db_password=env('POSTGRES_PASSWORD')
+            database=env("POSTGRES_DB"),
+            db_host=env("POSTGRES_HOST"),
+            db_user=env("POSTGRES_USER"),
+            db_password=env("POSTGRES_PASSWORD"),
         ),
         yoo_kassa=YooKassa(
-            account_id=env('YOOKASSA_ACCOUNT_ID'),
-            secret_key=env('YOOKASSA_SECRET_KEY')
-        )
+            account_id=env("YOOKASSA_ACCOUNT_ID"), secret_key=env("YOOKASSA_SECRET_KEY")
+        ),
     )

@@ -4,16 +4,25 @@ from aiogram import F
 from aiogram import Router
 
 from app.utils.generating_a_reply_message import generating_a_reply_message
-from app.database.db import query_item_in_database, get_db_connection, add_id_to_database, delete_id_to_database
-from app.keyboards.inline import create_kb_for_help, create_kb_for_contacts, create_kb_for_list_pzu
+from app.database.db import (
+    query_item_in_database,
+    get_db_connection,
+    add_id_to_database,
+    delete_id_to_database,
+)
+from app.keyboards.inline import (
+    create_kb_for_help,
+    create_kb_for_contacts,
+    create_kb_for_list_pzu,
+)
 from app.lexicon.lexicon import LEXICON
 
 import logging
 
-logger = logging.getLogger('lomportbot.commands')
+logger = logging.getLogger("lomportbot.commands")
 
 # Логгер для записи в базу данных
-db_logger = logging.getLogger('db_logger')
+db_logger = logging.getLogger("db_logger")
 
 router = Router()
 
@@ -22,10 +31,14 @@ router = Router()
 async def process_start_command(message: Message):
     # Проверяем, есть ли payload в команде /start
     if len(message.text.split()) > 1:
-        payload = message.text.split()[1]  # Получаем payload (например, "payment_success_100")
+        payload = message.text.split()[
+            1
+        ]  # Получаем payload (например, "payment_success_100")
         if payload.startswith("payment_success_"):
             amount = payload.split("_")[2]  # Извлекаем сумму
-            await message.answer(f"Спасибо за вашу поддержку в размере {amount} рублей! 🎉")
+            await message.answer(
+                f"Спасибо за вашу поддержку в размере {amount} рублей! 🎉"
+            )
     else:
         # Добавляем id в базу если еще нет
         user_id = message.from_user.id
@@ -34,32 +47,25 @@ async def process_start_command(message: Message):
         logger.info(
             f"Пользователь {user_id}, user_name: {message.from_user.username} - запустил бота"
         )
-        await message.answer(text=LEXICON['/start'])
+        await message.answer(text=LEXICON["/start"])
 
 
 # Этот хэндлер будет срабатывать на команду "/help"
 async def process_help_command(message: Message):
-    await message.answer(
-        text=LEXICON['/help'],
-        reply_markup=create_kb_for_help()
-    )
+    await message.answer(text=LEXICON["/help"], reply_markup=create_kb_for_help())
 
 
 # Этот хэндлер будет срабатывать на команду "/contacts"
 async def process_contacts_command(message: Message):
     await message.answer(
-        text=LEXICON['/contacts'],
-        reply_markup=create_kb_for_contacts()
+        text=LEXICON["/contacts"], reply_markup=create_kb_for_contacts()
     )
 
 
 # Этот хэндлер будет срабатывать на команду "/list_pzu"
 async def process_list_pzu_command(message: Message):
     kb = await create_kb_for_list_pzu()
-    await message.answer(
-        text='Вот список направлений, выбирай.',
-        reply_markup=kb
-    )
+    await message.answer(text="Вот список направлений, выбирай.", reply_markup=kb)
 
 
 # Этот хэндлер будет срабатывать на отправку боту фото
@@ -91,12 +97,14 @@ async def send_point(message: Message):
     try:
         # Делаем запрос к БД
         # Получаем ответ в виде кортежа
-        res_data = await query_item_in_database(message.text.upper().replace(" ", "").replace("-", ""))
+        res_data = await query_item_in_database(
+            message.text.upper().replace(" ", "").replace("-", "")
+        )
         # Передаем  полученный кортеж в функцию
         if res_data:
             reply_message = generating_a_reply_message(res_data)
         else:
-            reply_message = LEXICON['not_found']
+            reply_message = LEXICON["not_found"]
 
     except Exception as e:
         # Обработка ошибок
@@ -109,13 +117,16 @@ async def send_point(message: Message):
         # Запись в базу данных
         db_logger.info(
             'User id:%s, user_name:%s, fullname:%s запросил ПЗУ: "%s"',
-            message.from_user.id, message.from_user.username, message.from_user.full_name, message.text.upper(),
+            message.from_user.id,
+            message.from_user.username,
+            message.from_user.full_name,
+            message.text.upper(),
             extra={
-                'user_id': message.from_user.id,
-                'user_name': message.from_user.username,
-                'fullname': message.from_user.full_name,
-                'pzu_name': message.text.upper(),
-            }
+                "user_id": message.from_user.id,
+                "user_name": message.from_user.username,
+                "fullname": message.from_user.full_name,
+                "pzu_name": message.text.upper(),
+            },
         )
 
     # Добавляем id в базу если еще нет
@@ -134,7 +145,9 @@ async def process_user_blocked_bot(event: ChatMemberUpdated):
         user_id = event.from_user.id
         username = event.from_user.username
 
-        logger.warning(f"Пользователь {user_id}, user_name: {username} - заблокировал бота")
+        logger.warning(
+            f"Пользователь {user_id}, user_name: {username} - заблокировал бота"
+        )
 
         # Удаляем пользователя из базы данных
         await delete_id_to_database(user_id)

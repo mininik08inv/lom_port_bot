@@ -10,14 +10,14 @@ print(logger)
 
 
 async def direction_filter(callback: CallbackQuery) -> bool:
-    logger.debug('работает фильтр direction_filter')
+    logger.debug("работает фильтр direction_filter")
     """Фильтр для проверки, что callback.data - это существующее направление"""
     directions = await list_directions()
     return callback.data in directions
 
 
 async def pzu_filter(callback: CallbackQuery) -> bool:
-    logger.debug('работает фильтр pzu_filter')
+    logger.debug("работает фильтр pzu_filter")
     """Фильтр для проверки, что callback.data - это существующее pzu"""
     list_pzu = await get_list_pzu()
     return callback.data in list_pzu

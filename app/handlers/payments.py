@@ -12,7 +12,7 @@ from app.keyboards.inline import donat_amount_keyboard, transition_to_payment_ke
 from app.keyboards.kb import get_cancel_keyboard
 import logging
 
-logger = logging.getLogger('lomportbot.payments')
+logger = logging.getLogger("lomportbot.payments")
 
 config = load_config()
 
@@ -35,21 +35,21 @@ async def process_donate_command(message: Message, state: FSMContext):
     logger.info(f"User {message.from_user.id} инициировал процесс пожертвования.")
     # Отправляем сообщение с инлайн-клавиатурой для выбора суммы
     await message.answer(
-        "Выберите сумму для поддержки:",
-        reply_markup=donat_amount_keyboard()
+        "Выберите сумму для поддержки:", reply_markup=donat_amount_keyboard()
     )
     # Устанавливаем состояние ожидания ввода суммы
     await state.set_state(DonateState.waiting_for_amount)
 
 
 # Обработчик команды /donate
-@router.callback_query(F.data.in_('/donate'))
+@router.callback_query(F.data.in_("/donate"))
 async def process_donate_command(callback: CallbackQuery, state: FSMContext):
-    logger.info(f"User {callback.from_user.id} инициировал процесс пожертвования с помощью  callback.")
+    logger.info(
+        f"User {callback.from_user.id} инициировал процесс пожертвования с помощью  callback."
+    )
     # Отправляем сообщение с инлайн-клавиатурой для выбора суммы
     await callback.message.answer(
-        "Выберите сумму для поддержки:",
-        reply_markup=donat_amount_keyboard()
+        "Выберите сумму для поддержки:", reply_markup=donat_amount_keyboard()
     )
     # Устанавливаем состояние ожидания ввода суммы
     await state.set_state(DonateState.waiting_for_amount)
@@ -63,7 +63,9 @@ async def process_amount(callback: CallbackQuery, state: FSMContext):
     amount = int(callback.data.split("_")[1])
     logger.info(f"User {callback.from_user.id} выбрал сумму: {amount} RUB.")
     await state.update_data(amount=amount)
-    await create_payment(amount, user_id=callback.from_user.id, message=callback.message)
+    await create_payment(
+        amount, user_id=callback.from_user.id, message=callback.message
+    )
     await callback.answer()
 
 
@@ -80,7 +82,7 @@ async def process_custom_amount(callback: CallbackQuery, state: FSMContext):
 # Обработчик ручного ввода суммы
 @router.message(
     DonateState.waiting_for_custom_amount,
-    ~F.text.in_(["❌ Отмена"])  # Сначала проверяем отмену
+    ~F.text.in_(["❌ Отмена"]),  # Сначала проверяем отмену
 )
 async def process_amount_input(message: Message, state: FSMContext):
     # Проверка на число
@@ -94,30 +96,19 @@ async def process_amount_input(message: Message, state: FSMContext):
         await message.answer("Введите только цифры (например: 100)")
 
     # Повторно показываем клавиатуру с отменой
-    await message.answer(
-        "Попробуйте ещё раз:",
-        reply_markup=get_cancel_keyboard()
-    )
+    await message.answer("Попробуйте ещё раз:", reply_markup=get_cancel_keyboard())
 
 
 # Обработчик отмены
-@router.message(
-    DonateState.waiting_for_custom_amount,
-    F.text == "❌ Отмена"
-)
+@router.message(DonateState.waiting_for_custom_amount, F.text == "❌ Отмена")
 async def cancel_input(message: Message, state: FSMContext):
     await state.clear()
-    await message.answer(
-        "Ввод суммы отменён!",
-        reply_markup=ReplyKeyboardRemove()
-    )
+    await message.answer("Ввод суммы отменён!", reply_markup=ReplyKeyboardRemove())
     logger.info(f"User {message.from_user.id} отменил ввод суммы")
 
+
 # Для обработки отмены
-@router.message(
-    DonateState.waiting_for_custom_amount,
-    F.text == "❌ Отмена"
-)
+@router.message(DonateState.waiting_for_custom_amount, F.text == "❌ Отмена")
 async def cancel_amount_input(message: Message, state: FSMContext):
     await state.clear()
     await message.answer("Ввод суммы отменён.", reply_markup=ReplyKeyboardRemove())
@@ -127,35 +118,45 @@ async def cancel_amount_input(message: Message, state: FSMContext):
 @router.message(DonateState.waiting_for_custom_amount)
 async def process_invalid_amount(message: Message):
     logger.warning(f"User {message.from_user.id} ввёл неверную сумму: {message.text}.")
-    await message.answer("Пожалуйста, введите корректную сумму (только цифры, например, 300).")
+    await message.answer(
+        "Пожалуйста, введите корректную сумму (только цифры, например, 300)."
+    )
 
 
 # Функция для создания платежа
 async def create_payment(amount: int, user_id: int, message: Optional[Message] = None):
     try:
-        deep_link = f"https://t.me/lom_port_bot?payment_success=payment_success_{amount}"
+        deep_link = (
+            f"https://t.me/lom_port_bot?payment_success=payment_success_{amount}"
+        )
 
-        payment = yookassa.Payment.create({
-            "amount": {"value": f"{amount}.00", "currency": "RUB"},
-            "confirmation": {"type": "redirect", "return_url": deep_link},
-            "capture": True,
-            "description": "Донат для бота",
-            "metadata": {
-                "user_id": str(user_id),  # Сохраняем ID в metadata
-                "skip_receipt": "true"
+        payment = yookassa.Payment.create(
+            {
+                "amount": {"value": f"{amount}.00", "currency": "RUB"},
+                "confirmation": {"type": "redirect", "return_url": deep_link},
+                "capture": True,
+                "description": "Донат для бота",
+                "metadata": {
+                    "user_id": str(user_id),  # Сохраняем ID в metadata
+                    "skip_receipt": "true",
+                },
             }
-        })
+        )
 
         url = payment.confirmation.confirmation_url
         kb = transition_to_payment_keyboard(url)
 
         if message:
-            await message.answer("Нажмите кнопку ниже для перехода к оплате:", reply_markup=kb)
+            await message.answer(
+                "Нажмите кнопку ниже для перехода к оплате:", reply_markup=kb
+            )
         else:
             # Если message=None (например, при вызове из callback), логируем ошибку
             logger.warning(f"Сообщение недоступно для user_id={user_id}")
 
-        logger.info(f"Платеж создан | User: {user_id} | Сумма: {amount} RUB | URL: {url}")
+        logger.info(
+            f"Платеж создан | User: {user_id} | Сумма: {amount} RUB | URL: {url}"
+        )
 
     except Exception as e:
         logger.error(f"Ошибка платежа | User: {user_id} | Error: {e}")
@@ -171,4 +172,6 @@ async def process_start_command(message: Message):
         amount = args[1].split("_")[2]
         await message.answer(f"Спасибо за вашу поддержку в размере {amount} рублей! 🎉")
     else:
-        await message.answer("Добро пожаловать! Используйте /donate для поддержки бота.")
+        await message.answer(
+            "Добро пожаловать! Используйте /donate для поддержки бота."
+        )

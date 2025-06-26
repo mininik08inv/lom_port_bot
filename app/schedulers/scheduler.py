@@ -3,7 +3,7 @@ from aiogram import Bot
 from app.utils.mailing import monthly_mailing, daily_report
 import logging
 
-logger = logging.getLogger('lomportbot.scheduler')
+logger = logging.getLogger("lomportbot.scheduler")
 
 
 def setup_scheduler(bot: Bot) -> AsyncIOScheduler:

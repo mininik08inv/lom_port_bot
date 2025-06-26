@@ -17,7 +17,7 @@ from app.schedulers.scheduler import setup_scheduler  # Импортируем �
 from app.middlewares.db_access import DBAccessMiddleware  # Импорт middleware
 
 logging.config.dictConfig(logging_config)
-logger = logging.getLogger('lomportbot')
+logger = logging.getLogger("lomportbot")
 
 
 async def main():
@@ -40,13 +40,14 @@ async def main():
     await set_main_menu(bot)
     await bot.delete_webhook(drop_pending_updates=True)
 
-    logger.info('Бот запущен')
+    logger.info("Бот запущен")
     await dp.start_polling(bot)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     try:
         asyncio.run(main())
     except Exception as e:
         logger.exception("Ошибка при запуске бота: %s", e)
     finally:
-        logger.info('Бот остановлен')
+        logger.info("Бот остановлен")

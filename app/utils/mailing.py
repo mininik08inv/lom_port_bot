@@ -12,7 +12,7 @@ from app.config_data.config import load_config
 
 config = load_config()
 
-logger = logging.getLogger('lomportbot.mailing')
+logger = logging.getLogger("lomportbot.mailing")
 
 
 async def monthly_mailing(bot: Bot):
@@ -24,14 +24,14 @@ async def monthly_mailing(bot: Bot):
         logger.debug(f"Найдено {len(users)} пользователей для рассылки.")
 
         for user in users:
-            if user['user_id'] == 379228746:
-                logger.info('Пропускаем: ', user['user_id'])
+            if user["user_id"] == 379228746:
+                logger.info("Пропускаем: ", user["user_id"])
                 continue
             try:
                 await bot.send_message(
-                    chat_id=user['user_id'],
-                    text=LEXICON['mailing_list_text'],
-                    reply_markup=combined_kb
+                    chat_id=user["user_id"],
+                    text=LEXICON["mailing_list_text"],
+                    reply_markup=combined_kb,
                 )
                 logger.debug(f"Сообщение отправлено пользователю {user['user_id']}.")
             except Exception as e:
@@ -54,14 +54,16 @@ async def daily_report(bot: Bot):
         # Получаем текущую дату
         today = datetime.now()
         # Получаем вчерашнюю дату
-        yesterday = (datetime.now() - timedelta(days=1))
+        yesterday = datetime.now() - timedelta(days=1)
 
         # Получаем количество обработанных запросов за сегодня
         len_list_request = await get_list_requests(date_from=yesterday, date_to=today)
         number_of_requests_processed = len(len_list_request)
 
         # Формируем текст отчета
-        report_text = LEXICON['daily_report_text'].format(yesterday.strftime('%Y-%m-%d'), number_of_requests_processed)
+        report_text = LEXICON["daily_report_text"].format(
+            yesterday.strftime("%Y-%m-%d"), number_of_requests_processed
+        )
 
         # Отправляем сообщение каждому администратору
         for admin_id in config.tg_bot.admin_ids:
