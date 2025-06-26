@@ -3,7 +3,7 @@ from typing import Optional
 import yookassa
 from aiogram import Router, F
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
-from aiogram.filters import Command, MagicData
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 

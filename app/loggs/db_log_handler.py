@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import asyncpg
 from datetime import datetime
 from app.database.db import get_db_connection, execute_query
 

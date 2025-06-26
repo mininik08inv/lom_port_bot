@@ -1,5 +1,5 @@
 from aiogram import BaseMiddleware
-from aiogram.types import Message, TelegramObject, CallbackQuery
+from aiogram.types import TelegramObject
 from typing import Callable, Dict, Any, Awaitable
 import logging
 from app.database.db import get_db_connection  # Импортируйте ваш коннектор к БД

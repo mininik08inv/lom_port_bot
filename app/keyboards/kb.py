@@ -1,4 +1,3 @@
-from aiogram.types import message
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 

@@ -1,4 +1,3 @@
-import asyncio
 
 from aiogram.types import CallbackQuery
 from aiogram import Router
@@ -6,9 +5,7 @@ from aiogram import Router
 from app.filters.my_filters import direction_filter, pzu_filter
 from app.utils.generating_a_reply_message import generating_a_reply_message
 from app.database.db import (
-    list_directions,
     list_pzu_in_direction,
-    get_list_pzu,
     query_item_in_database,
     add_id_to_database,
 )

@@ -1,7 +1,5 @@
 import logging
-import os
 from datetime import datetime, timedelta
-import asyncio
 
 from aiogram import Bot
 

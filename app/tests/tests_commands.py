@@ -3,7 +3,7 @@ import pytest
 from aiogram import Dispatcher, Bot
 from aiogram.types import Message, User, Chat, Update
 from aiogram.filters import Command
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 from app.handlers.commands import process_start_command
 
 
