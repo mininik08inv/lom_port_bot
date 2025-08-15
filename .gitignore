@@ -167,3 +167,4 @@ poetry.lock
 
 ideas_for_implementation.txt
 /.env_prod
+weight_control_parser/
