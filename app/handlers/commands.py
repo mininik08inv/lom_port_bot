@@ -102,7 +102,7 @@ async def send_point(message: Message):
         )
         # Передаем  полученный кортеж в функцию
         if res_data:
-            reply_message = generating_a_reply_message(res_data)
+            reply_message = await generating_a_reply_message(res_data)
         else:
             reply_message = LEXICON["not_found"]
 

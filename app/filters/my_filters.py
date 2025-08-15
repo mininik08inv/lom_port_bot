@@ -5,7 +5,7 @@ from app.database.db import list_directions, get_list_pzu
 import logging
 
 logger = logging.getLogger(__name__)
-print(logger)
+
 
 
 async def direction_filter(callback: CallbackQuery) -> bool:

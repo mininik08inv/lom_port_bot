@@ -43,7 +43,7 @@ async def process_donate_command(message: Message, state: FSMContext):
 
 # Обработчик команды /donate
 @router.callback_query(F.data.in_("/donate"))
-async def process_donate_command(callback: CallbackQuery, state: FSMContext):
+async def process_donate_callback(callback: CallbackQuery, state: FSMContext):
     logger.info(
         f"User {callback.from_user.id} инициировал процесс пожертвования с помощью  callback."
     )
