@@ -5,11 +5,11 @@ from aiogram import Router
 from app.filters.my_filters import direction_filter, pzu_filter
 from app.utils.generating_a_reply_message import generating_a_reply_message
 from app.database.db import (
-    list_pzu_in_direction,
     query_item_in_database,
     add_id_to_database,
 )
 from app.keyboards.inline import create_kb_for_direction
+from app.handlers.weight_control_handlers import add_weight_control_check_to_pzu_response
 
 import logging
 
@@ -57,9 +57,30 @@ async def process_buttons_pzu_press(callback: CallbackQuery):
         user_id = callback.from_user.id
         await add_id_to_database(user_id)
         
-        # Отправляем ответ пользователю
+        # Отправляем первое сообщение
         await callback.message.edit_text(text=f"Вот ваше ПЗУ - {callback.data}")
-        await callback.message.answer(text=reply_message, parse_mode="HTML")
+        
+        # Проверяем весовой контроль если ПЗУ найден
+        if res_data:
+            try:
+                updated_message, weight_keyboard = await add_weight_control_check_to_pzu_response(
+                    res_data, reply_message
+                )
+                
+                if weight_keyboard:
+                    # Есть весовой контроль - отправляем с предупреждением и кнопками
+                    await callback.message.answer(text=updated_message, reply_markup=weight_keyboard, parse_mode="HTML")
+                else:
+                    # Весового контроля нет - обычная отправка
+                    await callback.message.answer(text=reply_message, parse_mode="HTML")
+            except Exception as e:
+                # Если ошибка в проверке весового контроля - отправляем обычный ответ
+                logger.warning(f"Ошибка при проверке весового контроля для callback: {e}")
+                await callback.message.answer(text=reply_message, parse_mode="HTML")
+        else:
+            # ПЗУ не найден - обычная отправка
+            await callback.message.answer(text=reply_message, parse_mode="HTML")
+        
         await callback.answer()
 
     except Exception as e:

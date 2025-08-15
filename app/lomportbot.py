@@ -9,7 +9,7 @@ import logging.config
 from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from app.handlers import commands, callback_directions, payments
+from app.handlers import commands, callback_directions, payments, weight_control_handlers, admin_commands
 from app.keyboards.set_menu import set_main_menu
 from app.loggs.logging_setting import logging_config
 from app.config_data.config import load_config
@@ -35,8 +35,11 @@ async def main():
     logger.debug("Планировщик запущен.")
 
     dp.include_router(payments.router)
+    dp.include_router(weight_control_handlers.router)
     dp.include_router(commands.router)
     dp.include_router(callback_directions.router)
+    dp.include_router(admin_commands.router)
+    
     await set_main_menu(bot)
     await bot.delete_webhook(drop_pending_updates=True)
 

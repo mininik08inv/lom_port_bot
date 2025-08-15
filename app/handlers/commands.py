@@ -16,6 +16,7 @@ from app.keyboards.inline import (
     create_kb_for_list_pzu,
 )
 from app.lexicon.lexicon import LEXICON
+from app.handlers.weight_control_handlers import add_weight_control_check_to_pzu_response
 
 import logging
 
@@ -133,7 +134,26 @@ async def send_point(message: Message):
     user_id = message.from_user.id
     await add_id_to_database(user_id)
 
-    await message.answer(text=reply_message, parse_mode="HTML")
+    # Проверяем весовой контроль если ПЗУ найден
+    if res_data:
+        try:
+            updated_message, weight_keyboard = await add_weight_control_check_to_pzu_response(
+                res_data, reply_message
+            )
+            
+            if weight_keyboard:
+                # Есть весовой контроль - отправляем с предупреждением и кнопками
+                await message.answer(text=updated_message, reply_markup=weight_keyboard, parse_mode="HTML")
+            else:
+                # Весового контроля нет - обычная отправка
+                await message.answer(text=reply_message, parse_mode="HTML")
+        except Exception as e:
+            # Если ошибка в проверке весового контроля - отправляем обычный ответ
+            logger.warning(f"Ошибка при проверке весового контроля: {e}")
+            await message.answer(text=reply_message, parse_mode="HTML")
+    else:
+        # ПЗУ не найден - обычная отправка
+        await message.answer(text=reply_message, parse_mode="HTML")
 
 
 # Этот хэндлер будет срабатывать на блокировку бота пользователем
@@ -158,13 +178,13 @@ async def process_user_unblocked_bot(event: ChatMemberUpdated):
     user_id = event.from_user.id
 
     db_conn = await get_db_connection()
-    with db_conn.cursor() as cur:
-        try:
-            # Удаляем пользователя из базы данных
-            cur.execute("DELETE FROM telegram_bot_users WHERE user_id = %s", (user_id,))
-            db_conn.commit()
-        except Exception as e:
-            logger.exception("Ошибка при удалении user_id из бд: %s", e)
+    try:
+        # Удаляем пользователя из базы данных
+        await db_conn.execute("DELETE FROM telegram_bot_users WHERE user_id = $1", user_id)
+    except Exception as e:
+        logger.exception("Ошибка при удалении user_id из бд: %s", e)
+    finally:
+        await db_conn.close()
 
     logger.warning(
         f"Пользователь {user_id}, user_name: {event.from_user.username} - РАЗблокировал бота"

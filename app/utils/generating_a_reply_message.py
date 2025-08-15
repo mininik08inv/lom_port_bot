@@ -1,4 +1,3 @@
-import requests
 from aiogram.utils.markdown import hlink
 
 import logging
