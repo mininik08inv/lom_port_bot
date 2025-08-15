@@ -3,10 +3,12 @@ from aiogram.utils.markdown import hlink
 
 import logging
 
+from app.utils.weather import get_weather
+
 logger = logging.getLogger("lomportbot.generating_a_reply_message")
 
 
-def generating_a_reply_message(point) -> str:
+async def generating_a_reply_message(point) -> str:
     yand_navi_url = hlink(
         " В путь с Яндекс Навигатором! ",
         f"https://yandex.ru/navi?whatshere%5Bpoint%5D={point[3]}%2C{point[2]}&whatshere%5Bzoom%5D=16.768925&ll={point[3]}%2C{point[2]}&z=16.768925&si=e5wmhgefmj352468jpym3ewa4m",
@@ -18,13 +20,7 @@ def generating_a_reply_message(point) -> str:
     two_gis_url = hlink(
         " В путь с 2GIS! ", f"https://2gis.ru/geo/{point[3]},{point[2]}"
     )
-    try:
-        weather = requests.get(
-            f"https://api.open-meteo.com/v1/forecast?latitude={point[2]}&longitude={point[3]}&current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m"
-        )
-    except Exception as e:
-        weather = False
-        logger.exception("Ошибка в получении погоды", e)
+    weather = await get_weather(point[2], point[3])
 
     if point[4]:
         phone_number = point[4]
@@ -32,7 +28,7 @@ def generating_a_reply_message(point) -> str:
         phone_number = "Неизвестен"
 
     if weather:
-        final_weather_data = weather.json()["current"]["temperature_2m"]
+        final_weather_data = weather["current"]["temperature_2m"]
     else:
         final_weather_data = "Ошибка загрузки погоды!"
 
