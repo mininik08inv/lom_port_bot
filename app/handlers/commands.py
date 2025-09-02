@@ -16,7 +16,7 @@ from app.keyboards.inline import (
     create_kb_for_list_pzu,
 )
 from app.lexicon.lexicon import LEXICON
-from app.handlers.weight_control_handlers import add_weight_control_check_to_pzu_response
+from app.handlers.weight_control_handlers import add_weight_control_check_to_pzu_response, convert_pzu_tuple_to_dict
 
 import logging
 
@@ -137,8 +137,10 @@ async def send_point(message: Message):
     # Проверяем весовой контроль если ПЗУ найден
     if res_data:
         try:
+            # Преобразуем кортеж в словарь для корректной работы с весовым контролем
+            pzu_data = convert_pzu_tuple_to_dict(res_data)
             updated_message, weight_keyboard = await add_weight_control_check_to_pzu_response(
-                res_data, reply_message
+                pzu_data, reply_message
             )
             
             if weight_keyboard:

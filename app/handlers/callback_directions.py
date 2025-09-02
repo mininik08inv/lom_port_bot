@@ -3,13 +3,14 @@ from aiogram.types import CallbackQuery
 from aiogram import Router
 
 from app.filters.my_filters import direction_filter, pzu_filter
+from app.lexicon.lexicon import LEXICON
 from app.utils.generating_a_reply_message import generating_a_reply_message
 from app.database.db import (
     query_item_in_database,
     add_id_to_database,
 )
 from app.keyboards.inline import create_kb_for_direction
-from app.handlers.weight_control_handlers import add_weight_control_check_to_pzu_response
+from app.handlers.weight_control_handlers import add_weight_control_check_to_pzu_response, convert_pzu_tuple_to_dict
 
 import logging
 
@@ -51,7 +52,7 @@ async def process_buttons_pzu_press(callback: CallbackQuery):
         if res_data:
             reply_message = await generating_a_reply_message(res_data)
         else:
-            reply_message = "Возможно вы ввели не верные данные или этого ПЗУ нет в базе!\n Инструкция здесь - /help а подробности в Меню"
+            reply_message = LEXICON["not_found"]
 
         # Добавляем пользователя в базу данных
         user_id = callback.from_user.id
@@ -62,9 +63,12 @@ async def process_buttons_pzu_press(callback: CallbackQuery):
         
         # Проверяем весовой контроль если ПЗУ найден
         if res_data:
+            logger.info(f"🔄 Начинаем проверку весового контроля для ПЗУ: {callback.data.upper()}")
             try:
+                # Преобразуем кортеж в словарь для корректной работы с весовым контролем
+                pzu_data = convert_pzu_tuple_to_dict(res_data)
                 updated_message, weight_keyboard = await add_weight_control_check_to_pzu_response(
-                    res_data, reply_message
+                    pzu_data, reply_message
                 )
                 
                 if weight_keyboard:
@@ -75,7 +79,9 @@ async def process_buttons_pzu_press(callback: CallbackQuery):
                     await callback.message.answer(text=reply_message, parse_mode="HTML")
             except Exception as e:
                 # Если ошибка в проверке весового контроля - отправляем обычный ответ
-                logger.warning(f"Ошибка при проверке весового контроля для callback: {e}")
+                logger.error(f"❌ Ошибка при проверке весового контроля для callback: {e}")
+                import traceback
+                logger.error(f"Traceback: {traceback.format_exc()}")
                 await callback.message.answer(text=reply_message, parse_mode="HTML")
         else:
             # ПЗУ не найден - обычная отправка
