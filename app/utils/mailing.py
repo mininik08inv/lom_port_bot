@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from datetime import datetime, timedelta
 
@@ -12,6 +13,16 @@ config = load_config()
 
 logger = logging.getLogger("lomportbot.mailing")
 
+async def send_mail(bot: Bot, user):
+    try:
+        await bot.send_message(
+            chat_id=user["user_id"],
+            text=LEXICON["mailing_list_text"],
+            reply_markup=combined_kb,
+        )
+        logger.debug(f"Сообщение отправлено пользователю {user['user_id']}.")
+    except Exception as e:
+        logger.error(f"Ошибка при отправке пользователю {user['user_id']}: {e}")
 
 async def monthly_mailing(bot: Bot):
     logger.debug("Запуск задачи рассылки...")
@@ -21,19 +32,14 @@ async def monthly_mailing(bot: Bot):
         users = await db_conn.fetch("SELECT user_id FROM telegram_bot_users")
         logger.debug(f"Найдено {len(users)} пользователей для рассылки.")
 
+        tasks = []
         for user in users:
             if user["user_id"] == 379228746:
                 logger.info("Пропускаем: ", user["user_id"])
                 continue
-            try:
-                await bot.send_message(
-                    chat_id=user["user_id"],
-                    text=LEXICON["mailing_list_text"],
-                    reply_markup=combined_kb,
-                )
-                logger.debug(f"Сообщение отправлено пользователю {user['user_id']}.")
-            except Exception as e:
-                logger.error(f"Ошибка при отправке пользователю {user['user_id']}: {e}")
+            tasks.append(send_mail(bot, user))
+
+        await asyncio.gather(*tasks)
 
         logger.info("Рассылка завершена.")
     except Exception as e:
