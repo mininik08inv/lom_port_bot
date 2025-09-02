@@ -115,11 +115,13 @@ def create_weight_control_keyboard(weight_controls: List[Dict], search_lat: floa
             button_text = f"📍 {wc['name'][:25]}... ({distance} км)"
             
             # Создаем ссылку на Яндекс.Карты
-            map_link = generate_yandex_map_link(
-                wc['latitude'], 
-                wc['longitude'], 
-                wc['name']
-            )
+            # map_link = generate_yandex_map_link(
+            #     wc['latitude'],
+            #     wc['longitude'],
+            #     wc['name']
+            # )
+
+            map_link = wc['url']
             
             # Добавляем кнопку
             buttons.append([
