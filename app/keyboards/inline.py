@@ -3,7 +3,6 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from typing import List, Dict
 
 from app.database.db import list_directions, list_pzu_in_direction
-from app.utils.map_utils import generate_yandex_map_link
 
 
 def create_kb_for_contacts():
