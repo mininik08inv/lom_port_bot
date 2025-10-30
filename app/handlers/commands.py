@@ -145,7 +145,7 @@ async def send_point(message: Message):
             
             if weight_keyboard:
                 # Есть весовой контроль - отправляем с предупреждением и кнопками
-                await message.answer(text=updated_message, reply_markup=weight_keyboard, parse_mode="HTML")
+                await message.answer(text=updated_message, parse_mode="HTML")
             else:
                 # Весового контроля нет - обычная отправка
                 await message.answer(text=reply_message, parse_mode="HTML")

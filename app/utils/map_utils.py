@@ -4,6 +4,7 @@
 
 from typing import List, Dict
 from urllib.parse import quote
+from aiogram.utils.markdown import hlink
 
 
 def generate_yandex_map_link(lat: float, lon: float, name: str) -> str:
@@ -131,43 +132,44 @@ def generate_weight_control_warning(weight_controls: List[Dict]) -> str:
         wc = weight_controls[0]
         distance = round(wc['distance'], 1)
         region_info = f" ({wc['region']} регион)" if wc.get('region') else ""
-        
+        link = hlink(
+            " 🚓 Подробнее на сайте! ",
+            f"https://lomovoz-portal.ru/map/wc?map_zoom=10&map_latitude={wc['latitude']}&map_longitude={wc['longitude']}"
+        )
+
+
         warning = f"🚨 ВНИМАНИЕ! В {distance} км найден пункт весового контроля:\n"
-        warning += f"📍 {wc['name']}{region_info}"
-        
-        if wc.get('district'):
-            warning += f"\n🏘️ {wc['district']}"
-            
-        if wc.get('description'):
-            desc = wc['description'][:100] + "..." if len(wc['description']) > 100 else wc['description']
-            warning += f"\n📝 {desc}"
+        warning += f"📍 {wc['name']}{region_info}\n"
+        warning += link
             
         return warning
     
     else:
         nearest = min(weight_controls, key=lambda x: x['distance'])
         nearest_distance = round(nearest['distance'], 1)
+
+        link = hlink(
+            " Подробнее на сайте! ",
+            f"https://lomovoz-portal.ru/map/wc?map_zoom=10&map_latitude={nearest['latitude']}&map_longitude={nearest['longitude']}"
+        )
         
         warning = f"🚨 ВНИМАНИЕ! Найдено {count} пунктов весового контроля в радиусе 50 км\n"
-        warning += f"📍 Ближайший: {nearest['name']} ({nearest_distance} км)"
-        
-        if nearest.get('region'):
-            region_name = get_region_name(nearest['region'])
-            warning += f" - {region_name}"
-            
+        warning += f"📍 Ближайший: {nearest['name']} ({nearest_distance} км)\n"
+        warning += link
+
         # Показываем еще несколько ближайших
-        if count > 1:
-            warning += "\n\n🔍 Другие пункты:"
-            for wc in weight_controls[1:4]:  # Показываем до 3 дополнительных
-                distance = round(wc['distance'], 1)
-                region_info = ""
-                if wc.get('region'):
-                    region_name = get_region_name(wc['region'])
-                    region_info = f" - {region_name}"
-                warning += f"\n• {wc['name'][:40]}... ({distance} км){region_info}"
-                
-        if count > 4:
-            warning += f"\n• ... и еще {count - 4} пунктов"
+        # if count > 1:
+        #     warning += "\n\n🔍 Другие пункты:"
+        #     for wc in weight_controls[1:4]:  # Показываем до 3 дополнительных
+        #         distance = round(wc['distance'], 1)
+        #         region_info = ""
+        #         if wc.get('region'):
+        #             region_name = get_region_name(wc['region'])
+        #             region_info = f" - {region_name}"
+        #         warning += f"\n• {wc['name'][:40]}... ({distance} км){region_info}"
+        #
+        # if count > 4:
+        #     warning += f"\n• ... и еще {count - 4} пунктов"
             
         return warning
 

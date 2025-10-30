@@ -73,7 +73,7 @@ async def process_buttons_pzu_press(callback: CallbackQuery):
                 
                 if weight_keyboard:
                     # Есть весовой контроль - отправляем с предупреждением и кнопками
-                    await callback.message.answer(text=updated_message, reply_markup=weight_keyboard, parse_mode="HTML")
+                    await callback.message.answer(text=updated_message, parse_mode="HTML")
                 else:
                     # Весового контроля нет - обычная отправка
                     await callback.message.answer(text=reply_message, parse_mode="HTML")
