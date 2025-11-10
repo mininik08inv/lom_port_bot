@@ -101,7 +101,7 @@ async def send_point(message: Message):
         res_data = await query_item_in_database(
             message.text.upper().replace(" ", "").replace("-", "")
         )
-        # Передаем  полученный кортеж в функцию
+        # Передаем полученный кортеж в функцию
         if res_data:
             reply_message = await generating_a_reply_message(res_data)
         else:
@@ -139,12 +139,12 @@ async def send_point(message: Message):
         try:
             # Преобразуем кортеж в словарь для корректной работы с весовым контролем
             pzu_data = convert_pzu_tuple_to_dict(res_data)
-            updated_message, weight_keyboard = await add_weight_control_check_to_pzu_response(
+            updated_message, is_fined = await add_weight_control_check_to_pzu_response(
                 pzu_data, reply_message
             )
             
-            if weight_keyboard:
-                # Есть весовой контроль - отправляем с предупреждением и кнопками
+            if is_fined:
+                # Есть весовой контроль - отправляем с предупреждением
                 await message.answer(text=updated_message, parse_mode="HTML")
             else:
                 # Весового контроля нет - обычная отправка

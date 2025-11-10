@@ -20,7 +20,7 @@ router = Router()
 async def add_weight_control_check_to_pzu_response(
     pzu_data: Dict[str, Any], 
     original_message: str
-) -> Tuple[str, Optional[InlineKeyboardMarkup]]:
+) -> Tuple[str, bool]:
     """
     Добавляет проверку весового контроля к ответу о ПЗУ
     
@@ -35,7 +35,7 @@ async def add_weight_control_check_to_pzu_response(
         # Проверяем наличие координат
         if not pzu_data.get('latitude') or not pzu_data.get('longitude'):
             logger.warning(f"ПЗУ {pzu_data.get('name', 'unknown')} не имеет координат для проверки весового контроля")
-            return original_message, None
+            return original_message, False
         
         lat = float(pzu_data['latitude'])
         lon = float(pzu_data['longitude'])
@@ -50,7 +50,7 @@ async def add_weight_control_check_to_pzu_response(
         
         if not weight_controls:
             logger.info(f"✅ Пунктов весового контроля рядом с ПЗУ {pzu_data.get('name', 'unknown')} не найдено")
-            return original_message, None
+            return original_message, False
         
         logger.info(f"⚠️ Найдено {len(weight_controls)} пунктов весового контроля рядом с ПЗУ {pzu_data.get('name', 'unknown')}")
         
@@ -60,15 +60,7 @@ async def add_weight_control_check_to_pzu_response(
         # Создаем обновленное сообщение
         updated_message = f"{original_message}\n\n{warning}"
         
-        # Создаем клавиатуру с ссылками на карты
-        keyboard = create_weight_control_keyboard(
-            weight_controls, 
-            search_lat=lat, 
-            search_lon=lon, 
-            search_radius=50
-        )
-        
-        return updated_message, keyboard
+        return updated_message, True
         
     except Exception as e:
         logger.error(f"❌ Ошибка при проверке весового контроля для ПЗУ {pzu_data.get('name', 'unknown')}: {e}")
