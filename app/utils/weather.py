@@ -14,5 +14,5 @@ async def get_weather(lat, lon):
                     return await response.json()
                 return None
         except Exception as e:
-            logger.error(f"Weather API error: {str(e)}", exc_info=True)
+            logger.error(f"Weather API error(Ошибка получения погоды): {str(e)}", exc_info=True)
             return None
