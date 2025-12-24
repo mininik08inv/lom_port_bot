@@ -69,8 +69,7 @@ class WeightControlService:
             
             # Запрос с предварительной фильтрацией по квадрату
             query = """
-                SELECT external_id, name, region, district, latitude, longitude, 
-                       address, description, url
+                SELECT name, region, latitude, longitude, address, description
                 FROM weight_control_points 
                 WHERE latitude IS NOT NULL 
                   AND longitude IS NOT NULL
@@ -98,15 +97,12 @@ class WeightControlService:
                 
                 if distance <= radius_km:
                     point_data = {
-                        'external_id': row['external_id'],
                         'name': row['name'],
                         'region': row['region'],
-                        'district': row['district'],
                         'latitude': float(row['latitude']),
                         'longitude': float(row['longitude']),
                         'address': row['address'],
                         'description': row['description'],
-                        'url': row['url'],
                         'distance': distance
                     }
                     nearby_points.append(point_data)
@@ -123,137 +119,4 @@ class WeightControlService:
             logger.error(f"Ошибка при поиске пунктов весового контроля: {e}")
             return []
     
-    @staticmethod
-    async def load_weight_control_data(json_file_path: str) -> bool:
-        """
-        Загружает данные о пунктах весового контроля из JSON файла в базу данных
-        
-        Args:
-            json_file_path: Путь к JSON файлу с данными
-            
-        Returns:
-            True если загрузка прошла успешно, False в случае ошибки
-        """
-        try:
-            with open(json_file_path, 'r', encoding='utf-8') as f:
-                data = json.load(f)
-            
-            logger.info(f"Загружаем {len(data)} пунктов весового контроля из {json_file_path}")
-            
-            conn = await get_db_connection()
-            
-            # Создаем таблицу если её нет
-            await conn.execute("""
-                CREATE TABLE IF NOT EXISTS weight_control_points (
-                    id SERIAL PRIMARY KEY,
-                    external_id VARCHAR(50) UNIQUE,
-                    name TEXT NOT NULL,
-                    region VARCHAR(10),
-                    district VARCHAR(100),
-                    latitude DECIMAL(10,8),
-                    longitude DECIMAL(11,8),
-                    address TEXT,
-                    description TEXT,
-                    url TEXT,
-                    created_at TIMESTAMP DEFAULT NOW(),
-                    updated_at TIMESTAMP DEFAULT NOW()
-                );
-            """)
-            
-            # Создаем индекс для быстрого поиска по координатам
-            await conn.execute("""
-                CREATE INDEX IF NOT EXISTS idx_weight_control_coords 
-                ON weight_control_points (latitude, longitude);
-            """)
-            
-            loaded_count = 0
-            skipped_count = 0
-            
-            for point in data:
-                try:
-                    # Загружаем только пункты с координатами
-                    if point.get('coordinates') and point['coordinates']:
-                        await conn.execute("""
-                            INSERT INTO weight_control_points 
-                            (external_id, name, region, district, latitude, longitude, 
-                             address, description, url)
-                            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-                            ON CONFLICT (external_id) DO UPDATE SET
-                                name = EXCLUDED.name,
-                                region = EXCLUDED.region,
-                                district = EXCLUDED.district,
-                                latitude = EXCLUDED.latitude,
-                                longitude = EXCLUDED.longitude,
-                                address = EXCLUDED.address,
-                                description = EXCLUDED.description,
-                                url = EXCLUDED.url,
-                                updated_at = NOW()
-                        """, 
-                        point['id'], 
-                        point['name'], 
-                        point.get('region', ''), 
-                        point.get('district', ''),
-                        point['coordinates']['lat'], 
-                        point['coordinates']['lng'],
-                        point.get('address', ''), 
-                        point.get('description', ''), 
-                        point.get('url', ''))
-                        
-                        loaded_count += 1
-                    else:
-                        skipped_count += 1
-                        
-                except Exception as e:
-                    logger.error(f"Ошибка при загрузке пункта {point.get('id', 'unknown')}: {e}")
-                    skipped_count += 1
-            
-            await conn.close()
-            
-            logger.info(f"Загрузка завершена: {loaded_count} загружено, {skipped_count} пропущено")
-            return True
-            
-        except Exception as e:
-            logger.error(f"Ошибка при загрузке данных весового контроля: {e}")
-            return False
-    
-    @staticmethod
-    async def get_stats() -> Dict:
-        """
-        Получает статистику по пунктам весового контроля в базе данных
-        
-        Returns:
-            Словарь со статистикой
-        """
-        try:
-            conn = await get_db_connection()
-            
-            # Общее количество
-            total_count = await conn.fetchval(
-                "SELECT COUNT(*) FROM weight_control_points"
-            )
-            
-            # Количество с координатами
-            with_coords_count = await conn.fetchval(
-                "SELECT COUNT(*) FROM weight_control_points WHERE latitude IS NOT NULL AND longitude IS NOT NULL"
-            )
-            
-            # Количество по регионам
-            regions_stats = await conn.fetch(
-                "SELECT region, COUNT(*) as count FROM weight_control_points WHERE region != '' GROUP BY region ORDER BY count DESC LIMIT 10"
-            )
-            
-            await conn.close()
-            
-            return {
-                'total_points': total_count,
-                'points_with_coordinates': with_coords_count,
-                'top_regions': [{'region': r['region'], 'count': r['count']} for r in regions_stats]
-            }
-            
-        except Exception as e:
-            logger.error(f"Ошибка при получении статистики: {e}")
-            return {
-                'total_points': 0,
-                'points_with_coordinates': 0,
-                'top_regions': []
-            }
+

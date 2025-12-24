@@ -133,8 +133,8 @@ def generate_weight_control_warning(weight_controls: List[Dict]) -> str:
         distance = round(wc['distance'], 1)
         region_info = f" ({wc['region']} регион)" if wc.get('region') else ""
         link = hlink(
-            " 🚓 Подробнее на сайте! ",
-            f"https://lomovoz-portal.ru/map/wc?map_zoom=10&map_latitude={wc['latitude']}&map_longitude={wc['longitude']}"
+            " 🚓 Подробнее в приложении!",
+            f"https://lomovoz-portal.ru/"
         )
 
 
@@ -149,27 +149,13 @@ def generate_weight_control_warning(weight_controls: List[Dict]) -> str:
         nearest_distance = round(nearest['distance'], 1)
 
         link = hlink(
-            " Подробнее на сайте! ",
-            f"https://lomovoz-portal.ru/map/wc?map_zoom=10&map_latitude={nearest['latitude']}&map_longitude={nearest['longitude']}"
+            " 🚓 Подробнее в приложении!",
+            f"https://lomovoz-portal.ru/"
         )
         
         warning = f"🚨 ВНИМАНИЕ! Найдено {count} пунктов весового контроля в радиусе 50 км\n"
         warning += f"📍 Ближайший: {nearest['name']} ({nearest_distance} км)\n"
         warning += link
-
-        # Показываем еще несколько ближайших
-        # if count > 1:
-        #     warning += "\n\n🔍 Другие пункты:"
-        #     for wc in weight_controls[1:4]:  # Показываем до 3 дополнительных
-        #         distance = round(wc['distance'], 1)
-        #         region_info = ""
-        #         if wc.get('region'):
-        #             region_name = get_region_name(wc['region'])
-        #             region_info = f" - {region_name}"
-        #         warning += f"\n• {wc['name'][:40]}... ({distance} км){region_info}"
-        #
-        # if count > 4:
-        #     warning += f"\n• ... и еще {count - 4} пунктов"
             
         return warning
 
@@ -215,9 +201,6 @@ def format_weight_control_info(wc: Dict) -> str:
     
     if wc.get('region'):
         info += f"🗺️ Регион: {wc['region']}\n"
-        
-    if wc.get('district'):
-        info += f"🏘️ Район: {wc['district']}\n"
         
     if wc.get('address'):
         info += f"🏠 Адрес: {wc['address']}\n"
